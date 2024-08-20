@@ -33,11 +33,18 @@ fun CameraScreen() {
 
             preview.setSurfaceProvider(previewView.surfaceProvider)
 
+            val imageAnalysis = ImageAnalysis.Builder().build()
+            imageAnalysis.setAnalyzer(
+                ContextCompat.getMainExecutor(context),
+                BarCodeAnalyzer(context)
+            )
+
             runCatching {
                 cameraProviderFuture.get().bindToLifecycle(
                     lifecycleOwner,
                     selector,
-                    preview
+                    preview,
+                    imageAnalysis
                 )
             }.onFailure {
                 Log.e("CAMERA", "Camera bind error ${it.localizedMessage}", it)

@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.Manifest
-import android.view.WindowInsets.Side
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
