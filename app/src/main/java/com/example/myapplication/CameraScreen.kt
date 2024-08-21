@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 
@@ -22,6 +23,8 @@ fun CameraScreen() {
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(localContext)
     }
+
+    val rootView = LocalView.current
 
     AndroidView(
         modifier = Modifier.fillMaxSize(),
@@ -37,7 +40,7 @@ fun CameraScreen() {
             val imageAnalysis = ImageAnalysis.Builder().build()
             imageAnalysis.setAnalyzer(
                 ContextCompat.getMainExecutor(context),
-                BarCodeAnalyzer(context)
+                BarCodeAnalyzer(context, rootView)
             )
 
             runCatching {

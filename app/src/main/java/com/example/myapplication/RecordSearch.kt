@@ -17,10 +17,10 @@ class RecordSearch {
             ) {
                 if (response.isSuccessful) {
                     val releases = response.body()?.results
-                    Log.d("body", releases?.first()?.title.toString())
                     if (!releases.isNullOrEmpty()) {
                         val record = releases.first().title
-                        callback(record)
+                        val cleanedRecord = record.replace(Regex("\\s*\\(.*\\)"), "")
+                        callback(cleanedRecord)
                     } else {
                         callback("No releases found")
                     }

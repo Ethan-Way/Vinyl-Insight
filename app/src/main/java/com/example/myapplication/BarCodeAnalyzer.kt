@@ -7,12 +7,19 @@ import android.view.View
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 
-class BarCodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
+
+class BarCodeAnalyzer(private val context: Context, private val rootView: View) :
+    ImageAnalysis.Analyzer {
 
     private val options = BarcodeScannerOptions.Builder()
         .setBarcodeFormats(
@@ -50,9 +57,23 @@ class BarCodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
                         if (currentTime - lastToast > toastInterval) {
                             currentToast?.cancel()
                             recordSearch.searchByBarcode(result) { record ->
-                                currentToast =
-                                    Toast.makeText(context, record, Toast.LENGTH_LONG)
-                                currentToast?.show()
+                                val alertDialog =
+                                    AlertDialog.Builder(context, R.style.CustomAlertDialog)
+                                        .setTitle("Record Found")
+                                        .setMessage(record)
+                                        .setPositiveButton("ok") { dialog: DialogInterface, _: Int ->
+                                            dialog.dismiss()
+                                        }
+                                        .create()
+                                alertDialog.setOnShowListener {
+                                    alertDialog.window?.setBackgroundDrawable(
+                                        ColorDrawable(
+                                            Color.TRANSPARENT
+                                        )
+                                    )
+
+                                }
+                                alertDialog.show()
                             }
                             lastToast = currentTime
 
