@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -56,15 +55,24 @@ class BarCodeAnalyzer(private val context: Context, private val rootView: View) 
                         val currentTime = System.currentTimeMillis()
                         if (currentTime - lastToast > toastInterval) {
                             currentToast?.cancel()
-                            recordSearch.searchByBarcode(result) { record ->
+                            recordSearch.searchByBarcode(result) { record, year, format, label, style ->
+                                val message = buildString {
+                                    append("$record\n")
+                                    append("$year\n")
+                                    append("$format\n")
+                                    append("$label\n")
+                                    append("$style\n")
+                                }
+
                                 val alertDialog =
                                     AlertDialog.Builder(context, R.style.CustomAlertDialog)
                                         .setTitle("Record Found")
-                                        .setMessage(record)
+                                        .setMessage(message)
                                         .setPositiveButton("ok") { dialog: DialogInterface, _: Int ->
                                             dialog.dismiss()
                                         }
                                         .create()
+
                                 alertDialog.setOnShowListener {
                                     alertDialog.window?.setBackgroundDrawable(
                                         ColorDrawable(
