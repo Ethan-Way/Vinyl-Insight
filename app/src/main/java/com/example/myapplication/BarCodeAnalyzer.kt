@@ -2,9 +2,8 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -18,7 +17,8 @@ class BarCodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
     private val options = BarcodeScannerOptions.Builder()
         .setBarcodeFormats(
             Barcode.FORMAT_EAN_13,
-            Barcode.FORMAT_UPC_A
+            Barcode.FORMAT_UPC_A,
+            Barcode.FORMAT_ALL_FORMATS
         )
         .build()
 
@@ -28,6 +28,8 @@ class BarCodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
 
     private var lastToast: Long = 0
     private val toastInterval: Long = 5000
+
+    private val recordSearch = RecordSearch()
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
@@ -47,9 +49,13 @@ class BarCodeAnalyzer(private val context: Context) : ImageAnalysis.Analyzer {
                         val currentTime = System.currentTimeMillis()
                         if (currentTime - lastToast > toastInterval) {
                             currentToast?.cancel()
-                            currentToast = Toast.makeText(context, result, Toast.LENGTH_LONG)
-                            currentToast?.show()
+                            recordSearch.searchByBarcode(result) { record ->
+                                currentToast =
+                                    Toast.makeText(context, record, Toast.LENGTH_LONG)
+                                currentToast?.show()
+                            }
                             lastToast = currentTime
+
                         }
                     }
                 }

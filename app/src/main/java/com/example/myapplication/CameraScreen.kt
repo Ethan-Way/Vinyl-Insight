@@ -22,6 +22,7 @@ fun CameraScreen() {
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(localContext)
     }
+
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
