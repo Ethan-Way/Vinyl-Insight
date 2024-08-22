@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -41,7 +40,6 @@ class BarCodeAnalyzer(private val context: Context) :
     private val toastInterval: Long = 5000
 
     private val recordSearch = RecordSearch()
-    private var scannable = true
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
