@@ -15,9 +15,16 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.text.Html
+import android.util.TypedValue
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 
 
-class BarCodeAnalyzer(private val context: Context, private val rootView: View) :
+class BarCodeAnalyzer(private val context: Context) :
     ImageAnalysis.Analyzer {
 
     private val options = BarcodeScannerOptions.Builder()
@@ -30,12 +37,11 @@ class BarCodeAnalyzer(private val context: Context, private val rootView: View) 
 
     private val scanner = BarcodeScanning.getClient(options)
 
-    private var currentToast: Toast? = null
-
     private var lastToast: Long = 0
     private val toastInterval: Long = 5000
 
     private val recordSearch = RecordSearch()
+    private var scannable = true
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
@@ -54,21 +60,35 @@ class BarCodeAnalyzer(private val context: Context, private val rootView: View) 
                     if (result.isNotEmpty()) {
                         val currentTime = System.currentTimeMillis()
                         if (currentTime - lastToast > toastInterval) {
-                            currentToast?.cancel()
-                            recordSearch.searchByBarcode(result) { record, year, format, label, style ->
+                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover ->
                                 val message = buildString {
-                                    append("$record\n")
-                                    append("$year\n")
-                                    append("$format\n")
-                                    append("$label\n")
-                                    append("$style\n")
+                                    append("<b>$record</b></font><br><br>")
+                                    append("Released $year - $country<br><br>")
+                                    append("$format<br><br>")
+                                    append("Label: $label<br><br>")
+                                    append("Genre: $genre<br>")
+                                    append("Style: $style<br>")
                                 }
+
+                                val dialogView = View.inflate(context, R.layout.dialog_layout, null)
+                                val imageView =
+                                    dialogView.findViewById<ImageView>(R.id.dialog_image)
+                                val messageView =
+                                    dialogView.findViewById<TextView>(R.id.dialog_message)
+
+                                Glide.with(context)
+                                    .load(cover)
+                                    .apply(RequestOptions().centerCrop())
+                                    .into(imageView)
+
+                                messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
+                                messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+
 
                                 val alertDialog =
                                     AlertDialog.Builder(context, R.style.CustomAlertDialog)
-                                        .setTitle("Record Found")
-                                        .setMessage(message)
-                                        .setPositiveButton("ok") { dialog: DialogInterface, _: Int ->
+                                        .setView(dialogView)
+                                        .setPositiveButton("close") { dialog: DialogInterface, _: Int ->
                                             dialog.dismiss()
                                         }
                                         .create()
@@ -77,6 +97,15 @@ class BarCodeAnalyzer(private val context: Context, private val rootView: View) 
                                     alertDialog.window?.setBackgroundDrawable(
                                         ColorDrawable(
                                             Color.TRANSPARENT
+                                        )
+                                    )
+
+                                    val positiveButton =
+                                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                    positiveButton.setTextColor(
+                                        ContextCompat.getColor(
+                                            context,
+                                            R.color.white
                                         )
                                     )
 
