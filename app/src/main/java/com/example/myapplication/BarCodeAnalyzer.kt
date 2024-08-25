@@ -15,6 +15,7 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.widget.ImageView
 import android.widget.TextView
@@ -58,14 +59,16 @@ class BarCodeAnalyzer(private val context: Context) :
                     if (result.isNotEmpty()) {
                         val currentTime = System.currentTimeMillis()
                         if (currentTime - lastToast > toastInterval) {
-                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover ->
+                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale ->
+
                                 val message = buildString {
                                     append("<b>$record</b></font><br><br>")
                                     append("Released $year - $country<br><br>")
                                     append("$format<br><br>")
                                     append("Label: $label<br><br>")
                                     append("Genre: $genre<br>")
-                                    append("Style: $style<br>")
+                                    append("Style: $style<br><br>")
+                                    append("$numForSale copies listed, starting at $lowestPrice<br>")
                                 }
 
                                 val dialogView = View.inflate(context, R.layout.dialog_layout, null)
@@ -81,7 +84,7 @@ class BarCodeAnalyzer(private val context: Context) :
 
                                 messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
                                 messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
-
+                                messageView.movementMethod = LinkMovementMethod.getInstance()
 
                                 val alertDialog =
                                     AlertDialog.Builder(context, R.style.CustomAlertDialog)

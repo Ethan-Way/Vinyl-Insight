@@ -55,3 +55,17 @@ data class Format(
     val text: String?,
     val descriptions: List<String>?
 )
+
+data class MasterDetailsResponse(
+    @SerializedName("lowest_price") val lowestPrice: Double?,
+    @SerializedName("num_for_sale") val numForSale: Int?,
+    val videos: List<Video>
+)
+
+data class Video(
+    val uri: String?,
+    val title: String?,
+    val description: String?,
+    val duration: Int?,
+    val embed: Boolean?
+)
