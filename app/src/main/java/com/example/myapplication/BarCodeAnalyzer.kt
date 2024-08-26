@@ -22,23 +22,21 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import org.json.JSONObject
 
-
-class BarCodeAnalyzer(private val context: Context) :
+class BarCodeAnalyzer(private val context: Context, private val onLoading: (Boolean) -> Unit) :
     ImageAnalysis.Analyzer {
 
     private val options = BarcodeScannerOptions.Builder()
         .setBarcodeFormats(
-            Barcode.FORMAT_EAN_13,
-            Barcode.FORMAT_UPC_A,
             Barcode.FORMAT_ALL_FORMATS
         )
         .build()
 
     private val scanner = BarcodeScanning.getClient(options)
 
-    private var lastToast: Long = 0
-    private val toastInterval: Long = 5000
+    private var lastScan: Long = 0
+    private val scanInterval: Long = 5000
 
     private val recordSearch = RecordSearch()
 
@@ -46,6 +44,7 @@ class BarCodeAnalyzer(private val context: Context) :
     override fun analyze(imageProxy: ImageProxy) {
 
         imageProxy.image?.let { image ->
+
             scanner.process(
                 InputImage.fromMediaImage(
                     image, imageProxy.imageInfo.rotationDegrees
@@ -58,8 +57,14 @@ class BarCodeAnalyzer(private val context: Context) :
 
                     if (result.isNotEmpty()) {
                         val currentTime = System.currentTimeMillis()
-                        if (currentTime - lastToast > toastInterval) {
-                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale ->
+                        if (currentTime - lastScan > scanInterval) {
+                            onLoading(true)
+
+                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url ->
+
+                                val links = url?.let { extractLinks(it) }
+                                val artistLink = links?.first
+                                val albumLink = links?.second
 
                                 val message = buildString {
                                     append("<b>$record</b></font><br><br>")
@@ -68,7 +73,9 @@ class BarCodeAnalyzer(private val context: Context) :
                                     append("Label: $label<br><br>")
                                     append("Genre: $genre<br>")
                                     append("Style: $style<br><br>")
-                                    append("$numForSale copies listed, starting at $lowestPrice<br>")
+                                    append("$numForSale copies listed, starting at $lowestPrice<br><br>")
+                                    append("<a href='$artistLink'>Artist</a><br>")
+                                    append("<a href='$albumLink'>Album</a>")
                                 }
 
                                 val dialogView = View.inflate(context, R.layout.dialog_layout, null)
@@ -82,8 +89,9 @@ class BarCodeAnalyzer(private val context: Context) :
                                     .apply(RequestOptions().centerCrop())
                                     .into(imageView)
 
-                                messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
-                                messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+                                messageView.text =
+                                    Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
+                                messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                                 messageView.movementMethod = LinkMovementMethod.getInstance()
 
                                 val alertDialog =
@@ -111,18 +119,43 @@ class BarCodeAnalyzer(private val context: Context) :
                                     )
 
                                 }
+                                onLoading(false)
                                 alertDialog.show()
                             }
-                            lastToast = currentTime
+                            lastScan = currentTime
 
                         }
                     }
                 }
             }.addOnFailureListener {
                 Log.e("BarCodeAnalyzer", "Barcode processing failed: ${it.localizedMessage}", it)
+                onLoading(false)
             }.addOnCompleteListener {
                 imageProxy.close()
             }
         }
     }
+
+    private fun extractLinks(json: String): Pair<String, String>? {
+        val jsonObject = JSONObject(json)
+        val albums = jsonObject.getJSONObject("albums")
+        val items = albums.getJSONArray("items")
+
+        if (items.length() > 0) {
+            val albumItem = items.getJSONObject(0)
+
+            // Extract the artist link
+            val artistArray = albumItem.getJSONArray("artists")
+            val artistObject = artistArray.getJSONObject(0)
+            val artistLink = artistObject.getJSONObject("external_urls").getString("spotify")
+
+            // Extract the album link
+            val albumLink = albumItem.getJSONObject("external_urls").getString("spotify")
+
+            return Pair(artistLink, albumLink)
+        }
+
+        return null
+    }
+
 }

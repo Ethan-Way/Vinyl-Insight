@@ -76,5 +76,4 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.material)
     implementation(libs.glide)
-
 }

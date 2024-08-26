@@ -59,13 +59,22 @@ data class Format(
 data class MasterDetailsResponse(
     @SerializedName("lowest_price") val lowestPrice: Double?,
     @SerializedName("num_for_sale") val numForSale: Int?,
-    val videos: List<Video>
 )
 
-data class Video(
-    val uri: String?,
-    val title: String?,
-    val description: String?,
-    val duration: Int?,
-    val embed: Boolean?
+data class SpotifySearchResponse(
+    val albums: Albums
+)
+
+data class Albums(
+    val items: List<AlbumItem>
+)
+
+data class AlbumItem(
+    val id: String,
+    val name: String,
+    val external_urls: ExternalUrls
+)
+
+data class ExternalUrls(
+    val spotify: String
 )

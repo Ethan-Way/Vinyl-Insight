@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
@@ -11,7 +13,7 @@ class RecordSearch {
 
     fun searchByBarcode(
         barcode: String,
-        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
+        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
     ) {
         api.searchByQuery(barcode).enqueue(object : Callback<DiscogsResponse> {
             override fun onResponse(
@@ -39,6 +41,8 @@ class RecordSearch {
                             val masterUrl = releases.first().masterUrl
 
                             val cleanedRecord = record.replace(Regex("\\s*\\(.*\\)"), "")
+                            val result = parseRecord(cleanedRecord)
+
                             val cleanedFormat = format?.first() + " (${
                                 format?.drop(1)?.joinToString(separator = ", ")
                             })"
@@ -46,38 +50,95 @@ class RecordSearch {
 
                             if (masterUrl != null) {
                                 fetchLowestPrice(masterUrl) { lowestPrice, numForSale ->
-                                    callback(
-                                        cleanedRecord,
-                                        year,
-                                        country,
-                                        cleanedFormat,
-                                        label,
-                                        genre,
-                                        cleanedStyle,
-                                        cover,
-                                        "$$lowestPrice",
-                                        numForSale
-                                    )
+                                    if (result != null) {
+                                        val (artist, album) = result
+                                        SpotifyUtils.getSpotifyAccessToken { token ->
+                                            if (token != null) {
+                                                SpotifyUtils.searchSpotifyAlbum(
+                                                    token,
+                                                    album,
+                                                    artist
+                                                ) { url ->
+                                                    Handler(Looper.getMainLooper()).post {
+                                                        callback(
+                                                            cleanedRecord,
+                                                            year,
+                                                            country,
+                                                            cleanedFormat,
+                                                            label,
+                                                            genre,
+                                                            cleanedStyle,
+                                                            cover,
+                                                            "$$lowestPrice",
+                                                            numForSale,
+                                                            url
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
 
-
                     } else {
-                        callback("No releases found", null, null, null, null, null, null, null, null, null)
+                        Handler(Looper.getMainLooper()).post {
+                            callback(
+                                "No releases found",
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            )
+                        }
                     }
                 } else {
                     Log.e(
                         "DiscogsRepository",
                         "Response error: ${response.errorBody()?.string()}"
                     )
-                    callback("Error fetching data", null, null, null, null, null, null, null, null, null)
+                    Handler(Looper.getMainLooper()).post {
+                        callback(
+                            "Error fetching data",
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        )
+                    }
                 }
             }
 
             override fun onFailure(call: Call<DiscogsResponse>, t: Throwable) {
                 Log.e("DiscogsRepository", "Network error: ${t.localizedMessage}")
-                callback("Error fetching data", null, null, null, null, null, null, null, null, null)
+                Handler(Looper.getMainLooper()).post {
+                    callback(
+                        "Error fetching data",
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                }
             }
         })
     }
@@ -92,17 +153,35 @@ class RecordSearch {
                     val lowestPrice = response.body()?.lowestPrice?.toString()
                     val numForSale = response.body()?.numForSale?.toString()
 
-                    callback(lowestPrice, numForSale)
+                    Handler(Looper.getMainLooper()).post {
+                        callback(lowestPrice, numForSale)
+                    }
                 } else {
                     Log.e("API Error", "Unsuccessful response: ${response.errorBody()?.string()}")
-                    callback(null, null)
+                    Handler(Looper.getMainLooper()).post {
+                        callback(null, null)
+                    }
                 }
             }
 
             override fun onFailure(call: Call<MasterDetailsResponse>, t: Throwable) {
                 Log.e("API Failure", "Failed to fetch data: ${t.message}")
-                callback(null, null)
+                // Call the callback with error on the main thread
+                Handler(Looper.getMainLooper()).post {
+                    callback(null, null)
+                }
             }
         })
+    }
+
+    private fun parseRecord(record: String): Pair<String, String>? {
+        val parts = record.split(" - ")
+        return if (parts.size == 2) {
+            val artist = parts[0].trim()
+            val album = parts[1].trim()
+            Pair(artist, album)
+        } else {
+            null
+        }
     }
 }
