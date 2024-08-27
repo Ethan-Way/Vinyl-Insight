@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.utils
 
+import com.example.myapplication.SpotifyApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

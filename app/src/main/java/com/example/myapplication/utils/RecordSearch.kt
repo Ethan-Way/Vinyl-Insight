@@ -6,7 +6,6 @@ import android.util.Log
 import com.example.myapplication.DiscogsClient
 import com.example.myapplication.DiscogsResponse
 import com.example.myapplication.MasterDetailsResponse
-import com.example.myapplication.SpotifyUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
