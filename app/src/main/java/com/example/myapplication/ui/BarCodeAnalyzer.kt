@@ -1,0 +1,219 @@
+package com.example.myapplication.ui
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.view.View
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.util.TypedValue
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.example.myapplication.R
+import com.example.myapplication.utils.RecordSearch
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.Record
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+
+class BarCodeAnalyzer(private val context: Context, private val onLoading: (Boolean) -> Unit) :
+    ImageAnalysis.Analyzer {
+
+    private val options = BarcodeScannerOptions.Builder()
+        .setBarcodeFormats(
+            Barcode.FORMAT_ALL_FORMATS
+        )
+        .build()
+
+    private val scanner = BarcodeScanning.getClient(options)
+
+    private var lastScan: Long = 0
+    private val scanInterval: Long = 5000
+
+    private val recordSearch = RecordSearch()
+
+    private val db = AppDatabase.getDatabase(context)
+
+    @SuppressLint("UnsafeOptInUsageError")
+    override fun analyze(imageProxy: ImageProxy) {
+
+        imageProxy.image?.let { image ->
+
+            scanner.process(
+                InputImage.fromMediaImage(
+                    image, imageProxy.imageInfo.rotationDegrees
+                )
+            ).addOnSuccessListener { barcode ->
+                if (barcode.isNotEmpty()) {
+                    val result = barcode.mapNotNull {
+                        it.rawValue ?: it.displayValue ?: it.url?.url
+                    }.joinToString(",")
+
+                    if (result.isNotEmpty()) {
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastScan > scanInterval) {
+                            onLoading(true)
+
+                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url ->
+
+                                val links = url?.let { extractLinks(it) }
+                                val artistLink = links?.first
+                                val albumLink = links?.second
+
+                                val message = buildString {
+                                    append("<b>$record</b></font><br><br>")
+                                    append("Released $year - $country<br><br>")
+                                    append("$format<br><br>")
+                                    append("Label: $label<br><br>")
+                                    append("Genre: $genre<br>")
+                                    append("Style: $style<br><br>")
+                                    append("$numForSale copies listed, starting at $lowestPrice<br><br>")
+                                    append("<a href='$albumLink'>Spotify</a>")
+                                }
+
+                                val dialogView = View.inflate(context, R.layout.dialog_layout, null)
+                                val imageView =
+                                    dialogView.findViewById<ImageView>(R.id.dialog_image)
+                                val messageView =
+                                    dialogView.findViewById<TextView>(R.id.dialog_message)
+
+                                Glide.with(context)
+                                    .load(cover)
+                                    .apply(RequestOptions().centerCrop())
+                                    .into(imageView)
+
+                                messageView.text =
+                                    Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
+                                messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+                                messageView.movementMethod = LinkMovementMethod.getInstance()
+
+                                val alertDialog =
+                                    AlertDialog.Builder(context, R.style.CustomAlertDialog)
+                                        .setView(dialogView)
+                                        .setPositiveButton("Close") { dialog: DialogInterface, _: Int ->
+                                            dialog.dismiss()
+                                        }
+                                        .setNegativeButton("Save") { _: DialogInterface, _: Int ->
+                                            val newRecord = Record(
+                                                title = record,
+                                                year = year.toString(),
+                                                country = country.toString(),
+                                                format = format.toString(),
+                                                label = label.toString(),
+                                                genre = genre.toString(),
+                                                style = style.toString(),
+                                                cover = cover.toString(),
+                                                lowestPrice = lowestPrice.toString(),
+                                                numForSale = numForSale.toString(),
+                                                spotifyLink = albumLink ?: ""
+                                            )
+
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                val recordExists = db.recordDao()
+                                                    .recordExists(newRecord.title, newRecord.year)
+                                                if (recordExists == 0) {
+                                                    db.recordDao().insert(newRecord)
+                                                    withContext(Dispatchers.Main) {
+                                                        Log.d(
+                                                            "BarCodeAnalyzer",
+                                                            "Record saved to database"
+                                                        )
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Record saved",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Record already saved",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+                                        }
+                                        .create()
+
+                                alertDialog.setOnShowListener {
+                                    alertDialog.window?.setBackgroundDrawable(
+                                        ColorDrawable(
+                                            Color.TRANSPARENT
+                                        )
+                                    )
+
+                                    val positiveButton =
+                                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                    positiveButton.setTextColor(
+                                        ContextCompat.getColor(
+                                            context,
+                                            R.color.white
+                                        )
+                                    )
+                                    val negativeButton =
+                                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                                    negativeButton.setTextColor(
+                                        ContextCompat.getColor(
+                                            context,
+                                            R.color.white
+                                        )
+                                    )
+
+                                }
+                                onLoading(false)
+                                alertDialog.show()
+                            }
+                            lastScan = currentTime
+
+                        }
+                    }
+                }
+            }.addOnFailureListener {
+                Log.e("BarCodeAnalyzer", "Barcode processing failed: ${it.localizedMessage}", it)
+                onLoading(false)
+            }.addOnCompleteListener {
+                imageProxy.close()
+            }
+        }
+    }
+
+    private fun extractLinks(json: String): Pair<String, String>? {
+        val jsonObject = JSONObject(json)
+        val albums = jsonObject.getJSONObject("albums")
+        val items = albums.getJSONArray("items")
+
+        if (items.length() > 0) {
+            val albumItem = items.getJSONObject(0)
+
+            // Extract the artist link
+            val artistArray = albumItem.getJSONArray("artists")
+            val artistObject = artistArray.getJSONObject(0)
+            val artistLink = artistObject.getJSONObject("external_urls").getString("spotify")
+
+            // Extract the album link
+            val albumLink = albumItem.getJSONObject("external_urls").getString("spotify")
+
+            return Pair(artistLink, albumLink)
+        }
+
+        return null
+    }
+
+}

@@ -1,8 +1,12 @@
-package com.example.myapplication
+package com.example.myapplication.utils
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.myapplication.DiscogsClient
+import com.example.myapplication.DiscogsResponse
+import com.example.myapplication.MasterDetailsResponse
+import com.example.myapplication.SpotifyUtils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -172,16 +176,5 @@ class RecordSearch {
                 }
             }
         })
-    }
-
-    private fun parseRecord(record: String): Pair<String, String>? {
-        val parts = record.split(" - ")
-        return if (parts.size == 2) {
-            val artist = parts[0].trim()
-            val album = parts[1].trim()
-            Pair(artist, album)
-        } else {
-            null
-        }
     }
 }
