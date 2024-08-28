@@ -1,12 +1,15 @@
 package com.example.myapplication.ui
 
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.compose.material3.Icon
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -318,13 +321,13 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
         append("Label: ${record.label}<br><br>")
         append("Genre: ${record.genre}<br>")
         append("Style: ${record.style}<br><br>")
-        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}<br><br>")
-        append("<a href='${record.spotifyLink}'>Spotify</a>")
+        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}")
     }
 
     val dialogView = View.inflate(context, R.layout.dialog_layout, null)
     val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image)
     val messageView = dialogView.findViewById<TextView>(R.id.dialog_message)
+    val playButton = dialogView.findViewById<Button>(R.id.button_play)
 
     Glide.with(context)
         .load(record.cover)
@@ -333,8 +336,15 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
 
     messageView.text =
         Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
-    messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
     messageView.movementMethod = LinkMovementMethod.getInstance()
+
+    playButton.setOnClickListener {
+        record.spotifyLink.let {
+            // Create an intent to open the Spotify link
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+            context.startActivity(intent)
+        }
+    }
 
     val alertDialog =
         android.app.AlertDialog.Builder(context, R.style.CustomAlertDialog)
