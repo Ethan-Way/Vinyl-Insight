@@ -18,7 +18,6 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.util.TypedValue
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -33,7 +32,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 
 class BarCodeAnalyzer(private val context: Context, private val onLoading: (Boolean) -> Unit) :
     ImageAnalysis.Analyzer {
