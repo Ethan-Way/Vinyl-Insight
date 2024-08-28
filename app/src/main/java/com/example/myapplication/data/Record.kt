@@ -16,7 +16,8 @@ data class Record(
     val cover: String,
     val lowestPrice: String,
     val numForSale: String,
-    val spotifyLink: String
+    val spotifyLink: String,
+    val timestamp: Long
 ) {
     override fun toString(): String {
         return "$title ($year)"

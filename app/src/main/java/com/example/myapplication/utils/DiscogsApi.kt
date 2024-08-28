@@ -1,5 +1,7 @@
-package com.example.myapplication
+package com.example.myapplication.utils
 
+import com.example.myapplication.DiscogsResponse
+import com.example.myapplication.MasterDetailsResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

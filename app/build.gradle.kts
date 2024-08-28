@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if(localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use {
+        localProperties.load(it)
+    }
 }
 
 android {
@@ -14,6 +24,10 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "spotifyClientId", localProperties["spotifyClientId"].toString())
+        buildConfigField("String", "spotifyClientSecret", localProperties["spotifyClientSecret"].toString())
+        buildConfigField("String", "discogsAccessToken", localProperties["discogsAccessToken"].toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -39,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -86,6 +101,8 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.androidx.animation)
     implementation(libs.coil.compose)
+    implementation("androidx.compose.material:material-icons-extended")
+
 
 
 }

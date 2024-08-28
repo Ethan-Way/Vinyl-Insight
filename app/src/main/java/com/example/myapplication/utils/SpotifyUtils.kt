@@ -1,12 +1,13 @@
 package com.example.myapplication.utils
 
+import com.example.myapplication.BuildConfig
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
 object SpotifyUtils {
-    private const val CLIENT_ID = ""
-    private const val CLIENT_SECRET = ""
+    private const val CLIENT_ID = BuildConfig.spotifyClientId
+    private const val CLIENT_SECRET = BuildConfig.spotifyClientSecret
     private const val TOKEN_URL = "https://accounts.spotify.com/api/token"
     private const val SEARCH_URL = "https://api.spotify.com/v1/search"
 

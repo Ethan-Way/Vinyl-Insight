@@ -1,5 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.utils
 
+import com.example.myapplication.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object DiscogsClient {
     private const val BASE_URL = "https://api.discogs.com/"
-    private const val TOKEN = ""
+    private const val TOKEN = BuildConfig.discogsAccessToken
 
     private val authInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()

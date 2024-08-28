@@ -12,10 +12,18 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.myapplication.utils.BarCodeAnalyzer
 
 @Composable
 fun CameraScreen(navController: NavController) {
@@ -80,10 +89,10 @@ fun CameraScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f))
+                        .background(color = Color.Black.copy(alpha = 0.8f))
                 )
                 CircularProgressIndicator(
-                    color = androidx.compose.ui.graphics.Color.White
+                    color = Color.White
                 )
             }
         }
@@ -95,12 +104,20 @@ fun CameraScreen(navController: NavController) {
                 contentColor = Color(0xFF333333)
             ),
             modifier = Modifier
-                .wrapContentSize()
                 .align(Alignment.TopEnd)
-                .padding(bottom = 20.dp)
+                .width(70.dp)
+                .height(70.dp)
+                .padding(top = 20.dp, end = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+            contentPadding = PaddingValues(0.dp)
 
         ) {
-            Text(text = "Saved")
+            Icon(
+                imageVector = Icons.Filled.Bookmark,
+                contentDescription = "Bookmark",
+                modifier = Modifier
+                    .size(30.dp)
+            )
         }
     }
 }

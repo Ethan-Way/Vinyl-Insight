@@ -3,7 +3,6 @@ package com.example.myapplication.utils
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.myapplication.DiscogsClient
 import com.example.myapplication.DiscogsResponse
 import com.example.myapplication.MasterDetailsResponse
 import retrofit2.Call

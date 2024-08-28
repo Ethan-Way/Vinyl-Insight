@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,7 +24,6 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.myapplication.R
-import com.example.myapplication.utils.RecordSearch
 import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +109,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                         .setPositiveButton("Close") { dialog: DialogInterface, _: Int ->
                                             dialog.dismiss()
                                         }
-                                        .setNegativeButton("Save") { _: DialogInterface, _: Int ->
+                                        .setNegativeButton("Save") { _, _: Int ->
                                             val newRecord = Record(
                                                 title = record,
                                                 year = year.toString(),
@@ -122,7 +121,8 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                                 cover = cover.toString(),
                                                 lowestPrice = lowestPrice.toString(),
                                                 numForSale = numForSale.toString(),
-                                                spotifyLink = albumLink ?: ""
+                                                spotifyLink = albumLink ?: "",
+                                                timestamp = System.currentTimeMillis()
                                             )
 
                                             CoroutineScope(Dispatchers.IO).launch {
@@ -142,11 +142,13 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                                         ).show()
                                                     }
                                                 } else {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Record already saved",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                    withContext(Dispatchers.Main) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Record already saved",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
                                                 }
                                             }
                                         }
@@ -193,27 +195,4 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
             }
         }
     }
-
-    private fun extractLinks(json: String): Pair<String, String>? {
-        val jsonObject = JSONObject(json)
-        val albums = jsonObject.getJSONObject("albums")
-        val items = albums.getJSONArray("items")
-
-        if (items.length() > 0) {
-            val albumItem = items.getJSONObject(0)
-
-            // Extract the artist link
-            val artistArray = albumItem.getJSONArray("artists")
-            val artistObject = artistArray.getJSONObject(0)
-            val artistLink = artistObject.getJSONObject("external_urls").getString("spotify")
-
-            // Extract the album link
-            val albumLink = albumItem.getJSONObject("external_urls").getString("spotify")
-
-            return Pair(artistLink, albumLink)
-        }
-
-        return null
-    }
-
 }

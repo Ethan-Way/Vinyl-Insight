@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import android.content.DialogInterface
+import androidx.compose.material3.Icon
 import android.graphics.drawable.ColorDrawable
 import android.text.Html
 import android.text.method.LinkMovementMethod
@@ -14,8 +15,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,16 +56,22 @@ fun SavedScreen(navController: NavController) {
     val recordDao: RecordDao = db.recordDao()
     var records by remember { mutableStateOf<List<Record>>(emptyList()) }
     var selectedRecord by remember { mutableStateOf<Pair<Record?, Long>>(null to 0L) }
+    var selectedFilter by remember { mutableStateOf("AlphabeticalArtist") }
+    var showDialog by remember { mutableStateOf(false) }
 
     // Load records from the database
     LaunchedEffect(Unit) {
         records = recordDao.getAllRecords()
     }
 
-    // Sort and group records
-    val groupedRecords = records
-        .sortedBy { it.title }
-        .groupBy { it.title.firstOrNull()?.uppercaseChar() ?: '?' }
+    // Filter and sort records based on the selected filter
+    val sortedRecords = when (selectedFilter) {
+        "AlphabeticalArtist" -> records.sortedBy { parseRecord(it.title)?.first }
+        "AlphabeticalAlbum" -> records.sortedBy { parseRecord(it.title)?.second }
+        "NewestTimestamp" -> records.sortedByDescending { it.timestamp }
+        "OldestTimestamp" -> records.sortedBy { it.timestamp }
+        else -> records
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -78,6 +90,25 @@ fun SavedScreen(navController: NavController) {
                         )
                     }
                 },
+                actions = {
+                    Button(
+                        onClick = { showDialog = true },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier
+                            .width(80.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = "Sort",
+                            modifier = Modifier
+                                .size(40.dp)
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(51, 51, 51),
                     titleContentColor = Color.White
@@ -85,31 +116,102 @@ fun SavedScreen(navController: NavController) {
             )
         }
 
-        groupedRecords.forEach { (letter, records) ->
-            if (letter != '?') {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 5.dp)
-                    ) {
-                        Text(
-                            text = letter.toString(),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                        )
+        when (selectedFilter) {
+            "AlphabeticalArtist" -> {
+                val groupedRecords = sortedRecords.groupBy {
+                    parseRecord(it.title)?.first?.firstOrNull()?.uppercaseChar() ?: '?'
+                }
+                groupedRecords.forEach { (letter, records) ->
+                    if (letter != '?') {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 5.dp)
+                            ) {
+                                Text(
+                                    text = letter.toString(),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                    }
+
+                    records.forEach { record ->
+                        item {
+                            RecordItem(record = record, onClick = {
+                                selectedRecord = record to System.currentTimeMillis()
+                            })
+                        }
                     }
                 }
             }
 
-            records.forEach { record ->
-                item {
-                    RecordItem(record = record, onClick = {
-                        selectedRecord = record to System.currentTimeMillis()
-                    })
+            "AlphabeticalAlbum" -> {
+                val groupedRecords = sortedRecords.groupBy {
+                    parseRecord(it.title)?.second?.firstOrNull()?.uppercaseChar() ?: '?'
+                }
+                groupedRecords.forEach { (letter, records) ->
+                    if (letter != '?') {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 5.dp)
+                            ) {
+                                Text(
+                                    text = letter.toString(),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                    }
+
+                    records.forEach { record ->
+                        item {
+                            RecordItem(record = record, onClick = {
+                                selectedRecord = record to System.currentTimeMillis()
+                            })
+                        }
+                    }
+                }
+            }
+
+            "NewestTimestamp", "OldestTimestamp" -> {
+                val groupedRecords = sortedRecords.groupBy { record ->
+                    java.text.SimpleDateFormat("MMM dd, yyyy").format(record.timestamp)
+                }
+
+                groupedRecords.forEach { (date, records) ->
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 5.dp)
+                        ) {
+                            Text(
+                                text = date,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+
+                    records.forEach { record ->
+                        item {
+                            RecordItem(record = record, onClick = {
+                                selectedRecord = record to System.currentTimeMillis()
+                            })
+                        }
+                    }
                 }
             }
         }
@@ -120,7 +222,6 @@ fun SavedScreen(navController: NavController) {
             record = record,
             onDismiss = { selectedRecord = null to 0L },
             onDelete = {
-                // Refresh the records list after deletion
                 CoroutineScope(Dispatchers.IO).launch {
                     val updatedRecords = recordDao.getAllRecords()
                     withContext(Dispatchers.Main) {
@@ -130,6 +231,12 @@ fun SavedScreen(navController: NavController) {
             }
         )
     }
+
+    CustomDialog(showDialog = showDialog, onDismiss = { showDialog = false },
+        onSelectFilter = { filter ->
+            selectedFilter = filter
+            showDialog = false
+        })
 }
 
 @Composable
