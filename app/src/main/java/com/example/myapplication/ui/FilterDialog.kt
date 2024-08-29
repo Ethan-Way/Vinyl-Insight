@@ -36,7 +36,7 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Artist (A - Z)",
+                        text = "Artist (A - Z)                                                      ",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier.clickable {
@@ -46,7 +46,7 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Album (A - Z)",
+                        text = "Album (A - Z)                                                       ",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier.clickable {
@@ -56,7 +56,7 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Newest Added",
+                        text = "Newest Added                                                        ",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier.clickable {
@@ -66,7 +66,7 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Oldest Added",
+                        text = "Oldest Added                                                        ",
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier.clickable {
