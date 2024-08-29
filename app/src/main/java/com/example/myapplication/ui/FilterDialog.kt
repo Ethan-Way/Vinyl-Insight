@@ -26,10 +26,10 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                     .fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(20.dp)
                 ) {
                     Text(
-                        text = "Select Filter",
+                        text = "Sort By",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
@@ -74,6 +74,7 @@ fun CustomDialog(showDialog: Boolean, onDismiss: () -> Unit, onSelectFilter: (St
                             onDismiss()
                         }
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

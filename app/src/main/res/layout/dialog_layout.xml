@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/rounded_dialog">
 
     <ImageView
         android:id="@+id/dialog_image"
@@ -15,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        android:background="#333333">
 
         <TextView
             android:id="@+id/dialog_message"
@@ -27,9 +29,57 @@
 
         <Button
             android:id="@+id/button_play"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/play_button"
-            android:textColor="@android:color/transparent" />
+            android:textColor="@android:color/transparent"
+            android:layout_marginEnd="15dp"/>
     </LinearLayout>
+
+    <!-- Star Rating at the Bottom -->
+    <LinearLayout
+        android:id="@+id/rating_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start">
+
+        <ImageView
+            android:id="@+id/star1"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/star_empty" />
+
+        <ImageView
+            android:id="@+id/star2"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/star_empty" />
+
+        <ImageView
+            android:id="@+id/star3"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/star_empty" />
+
+        <ImageView
+            android:id="@+id/star4"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/star_empty" />
+
+        <ImageView
+            android:id="@+id/star5"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/star_empty" />
+    </LinearLayout>
+
+    <!-- Review Text Below the Stars -->
+    <TextView
+        android:id="@+id/rating_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="17sp" />
 </LinearLayout>

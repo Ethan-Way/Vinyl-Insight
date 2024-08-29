@@ -17,14 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -100,8 +98,8 @@ fun CameraScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate("savedScreen") },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color(0xFF333333)
+                containerColor = Color(51, 51, 51),
+                contentColor = Color.White
             ),
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -116,7 +114,7 @@ fun CameraScreen(navController: NavController) {
                 imageVector = Icons.Filled.Bookmark,
                 contentDescription = "Bookmark",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(25.dp)
             )
         }
     }

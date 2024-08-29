@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.data
 
 import com.google.gson.annotations.SerializedName
 
@@ -59,22 +59,16 @@ data class Format(
 data class MasterDetailsResponse(
     @SerializedName("lowest_price") val lowestPrice: Double?,
     @SerializedName("num_for_sale") val numForSale: Int?,
+    @SerializedName("main_release_url") val mainReleaseUrl: String?
 )
 
-data class SpotifySearchResponse(
-    val albums: Albums
+data class RatingResponse(
+    @SerializedName("release_id") val releaseId: Int,
+    val rating: Rating
 )
 
-data class Albums(
-    val items: List<AlbumItem>
+data class Rating(
+    val count: Int,
+    val average: Double
 )
 
-data class AlbumItem(
-    val id: String,
-    val name: String,
-    val external_urls: ExternalUrls
-)
-
-data class ExternalUrls(
-    val spotify: String
-)

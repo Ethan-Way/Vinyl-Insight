@@ -41,6 +41,7 @@ import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
 import com.example.myapplication.data.RecordDao
 import com.example.myapplication.utils.parseRecord
+import com.example.myapplication.utils.setRatingStars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -307,7 +308,6 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
 fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Unit) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getDatabase(context) }
-    val recordDao: RecordDao = db.recordDao()
 
     val message = buildString {
         append("<b>${record.title}</b><br><br>")
@@ -316,79 +316,16 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
         append("Label: ${record.label}<br><br>")
         append("Genre: ${record.genre}<br>")
         append("Style: ${record.style}<br><br>")
-        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}")
+        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}<br>")
     }
 
-    val dialogView = View.inflate(context, R.layout.dialog_layout, null)
-    val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image)
-    val messageView = dialogView.findViewById<TextView>(R.id.dialog_message)
-    val playButton = dialogView.findViewById<Button>(R.id.button_play)
+    val alertDialog = createRecordDetailDialog(
+        context = context,
+        record = record,
+        message = message,
+        onDismiss = onDismiss,
+        onDelete = onDelete
+    )
 
-    Glide.with(context)
-        .load(record.cover)
-        .apply(RequestOptions().centerCrop())
-        .into(imageView)
-
-    messageView.text =
-        Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
-    messageView.movementMethod = LinkMovementMethod.getInstance()
-
-    playButton.setOnClickListener {
-        record.spotifyLink.let {
-            // Create an intent to open the Spotify link
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-            context.startActivity(intent)
-        }
-    }
-
-    val alertDialog =
-        android.app.AlertDialog.Builder(context, R.style.CustomAlertDialog)
-            .setView(dialogView)
-            .setPositiveButton("Close") { dialog: DialogInterface, _: Int ->
-                dialog.dismiss()
-                onDismiss()
-            }
-            .setNegativeButton("Remove") { dialog: DialogInterface, _: Int ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    recordDao.delete(record)
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            "Record removed",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        onDelete()
-                        dialog.dismiss()
-                        onDismiss()
-                    }
-                }
-            }
-            .create()
-
-    alertDialog.setOnShowListener {
-        alertDialog.window?.setBackgroundDrawable(
-            ColorDrawable(
-                android.graphics.Color.TRANSPARENT
-            )
-        )
-
-        val positiveButton =
-            alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(
-            ContextCompat.getColor(
-                context,
-                R.color.white
-            )
-        )
-        val negativeButton =
-            alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(
-            ContextCompat.getColor(
-                context,
-                R.color.white
-            )
-        )
-
-    }
     alertDialog.show()
 }

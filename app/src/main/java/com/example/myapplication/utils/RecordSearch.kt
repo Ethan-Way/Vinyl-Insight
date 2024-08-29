@@ -3,8 +3,9 @@ package com.example.myapplication.utils
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.myapplication.DiscogsResponse
-import com.example.myapplication.MasterDetailsResponse
+import com.example.myapplication.data.DiscogsResponse
+import com.example.myapplication.data.MasterDetailsResponse
+import com.example.myapplication.data.RatingResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,7 +16,7 @@ class RecordSearch {
 
     fun searchByBarcode(
         barcode: String,
-        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
+        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
     ) {
         api.searchByQuery(barcode).enqueue(object : Callback<DiscogsResponse> {
             override fun onResponse(
@@ -51,30 +52,36 @@ class RecordSearch {
                             val cleanedStyle = style?.joinToString(separator = ", ")
 
                             if (masterUrl != null) {
-                                fetchLowestPrice(masterUrl) { lowestPrice, numForSale ->
-                                    if (result != null) {
-                                        val (artist, album) = result
-                                        SpotifyUtils.getSpotifyAccessToken { token ->
-                                            if (token != null) {
-                                                SpotifyUtils.searchSpotifyAlbum(
-                                                    token,
-                                                    album,
-                                                    artist
-                                                ) { url ->
-                                                    Handler(Looper.getMainLooper()).post {
-                                                        callback(
-                                                            cleanedRecord,
-                                                            year,
-                                                            country,
-                                                            cleanedFormat,
-                                                            label,
-                                                            genre,
-                                                            cleanedStyle,
-                                                            cover,
-                                                            "$$lowestPrice",
-                                                            numForSale,
-                                                            url
-                                                        )
+                                fetchLowestPrice(masterUrl) { lowestPrice, numForSale, mainReleaseUrl ->
+                                    if (mainReleaseUrl != null) {
+                                        fetchRating(mainReleaseUrl) { averageRating, ratingCount ->
+                                            if (result != null) {
+                                                val (artist, album) = result
+                                                SpotifyUtils.getSpotifyAccessToken { token ->
+                                                    if (token != null) {
+                                                        SpotifyUtils.searchSpotifyAlbum(
+                                                            token,
+                                                            album,
+                                                            artist
+                                                        ) { url ->
+                                                            Handler(Looper.getMainLooper()).post {
+                                                                callback(
+                                                                    cleanedRecord,
+                                                                    year,
+                                                                    country,
+                                                                    cleanedFormat,
+                                                                    label,
+                                                                    genre,
+                                                                    cleanedStyle,
+                                                                    cover,
+                                                                    "$$lowestPrice",
+                                                                    numForSale,
+                                                                    url,
+                                                                    averageRating.toString(),
+                                                                    ratingCount.toString()
+                                                                )
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -88,6 +95,8 @@ class RecordSearch {
                         Handler(Looper.getMainLooper()).post {
                             callback(
                                 "No releases found",
+                                null,
+                                null,
                                 null,
                                 null,
                                 null,
@@ -118,6 +127,8 @@ class RecordSearch {
                             null,
                             null,
                             null,
+                            null,
+                            null,
                             null
                         )
                     }
@@ -138,6 +149,8 @@ class RecordSearch {
                         null,
                         null,
                         null,
+                        null,
+                        null,
                         null
                     )
                 }
@@ -145,7 +158,7 @@ class RecordSearch {
         })
     }
 
-    private fun fetchLowestPrice(masterUrl: String, callback: (String?, String?) -> Unit) {
+    private fun fetchLowestPrice(masterUrl: String, callback: (String?, String?, String?) -> Unit) {
         api.getMasterDetails(masterUrl).enqueue(object : Callback<MasterDetailsResponse> {
             override fun onResponse(
                 call: Call<MasterDetailsResponse>,
@@ -154,9 +167,38 @@ class RecordSearch {
                 if (response.isSuccessful) {
                     val lowestPrice = response.body()?.lowestPrice?.toString()
                     val numForSale = response.body()?.numForSale?.toString()
+                    val mainReleaseUrl = response.body()?.mainReleaseUrl?.toString()
 
                     Handler(Looper.getMainLooper()).post {
-                        callback(lowestPrice, numForSale)
+                        callback(lowestPrice, numForSale, mainReleaseUrl)
+                    }
+                } else {
+                    Log.e("API Error", "Unsuccessful response: ${response.errorBody()?.string()}")
+                    Handler(Looper.getMainLooper()).post {
+                        callback(null, null, null)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<MasterDetailsResponse>, t: Throwable) {
+                Log.e("API Failure", "Failed to fetch data: ${t.message}")
+                // Call the callback with error on the main thread
+                Handler(Looper.getMainLooper()).post {
+                    callback(null, null, null)
+                }
+            }
+        })
+    }
+
+    fun fetchRating(mainReleaseUrl: String, callback: (Double?, Int?) -> Unit) {
+        val ratingUrl = "$mainReleaseUrl/rating"
+        api.getRating(ratingUrl).enqueue(object : Callback<RatingResponse> {
+            override fun onResponse(call: Call<RatingResponse>, response: Response<RatingResponse>) {
+                if (response.isSuccessful) {
+                    val averageRating = response.body()?.rating?.average
+                    val ratingCount = response.body()?.rating?.count
+                    Handler(Looper.getMainLooper()).post {
+                        callback(averageRating, ratingCount)
                     }
                 } else {
                     Log.e("API Error", "Unsuccessful response: ${response.errorBody()?.string()}")
@@ -166,13 +208,13 @@ class RecordSearch {
                 }
             }
 
-            override fun onFailure(call: Call<MasterDetailsResponse>, t: Throwable) {
+            override fun onFailure(call: Call<RatingResponse>, t: Throwable) {
                 Log.e("API Failure", "Failed to fetch data: ${t.message}")
-                // Call the callback with error on the main thread
                 Handler(Looper.getMainLooper()).post {
                     callback(null, null)
                 }
             }
         })
     }
+
 }

@@ -1,7 +1,8 @@
 package com.example.myapplication.utils
 
-import com.example.myapplication.DiscogsResponse
-import com.example.myapplication.MasterDetailsResponse
+import com.example.myapplication.data.DiscogsResponse
+import com.example.myapplication.data.MasterDetailsResponse
+import com.example.myapplication.data.RatingResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -15,4 +16,7 @@ interface DiscogsApi {
 
     @GET
     fun getMasterDetails(@Url url: String): Call<MasterDetailsResponse>
+
+    @GET
+    fun getRating(@Url url: String): Call<RatingResponse>
 }
