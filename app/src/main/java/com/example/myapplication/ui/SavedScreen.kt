@@ -44,6 +44,7 @@ import com.example.myapplication.utils.parseRecord
 import com.example.myapplication.utils.setRatingStars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -57,6 +58,8 @@ fun SavedScreen(navController: NavController) {
     var selectedRecord by remember { mutableStateOf<Pair<Record?, Long>>(null to 0L) }
     var selectedFilter by remember { mutableStateOf("AlphabeticalArtist") }
     var showDialog by remember { mutableStateOf(false) }
+    var isClickable by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
 
     // Load records from the database
     LaunchedEffect(Unit) {
@@ -91,7 +94,17 @@ fun SavedScreen(navController: NavController) {
                 },
                 actions = {
                     Button(
-                        onClick = { showDialog = true },
+                        onClick = {
+                            if (isClickable) {
+                                isClickable = false
+                                showDialog = true
+
+                                scope.launch {
+                                    delay(1000)
+                                    isClickable = true
+                                }
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = Color.White
