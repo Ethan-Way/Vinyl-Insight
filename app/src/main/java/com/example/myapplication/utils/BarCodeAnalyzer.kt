@@ -16,12 +16,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -72,19 +74,18 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                         if (currentTime - lastScan > scanInterval) {
                             onLoading(true)
 
-                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount ->
+                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
 
                                 val links = url?.let { extractLinks(it) }
                                 val albumLink = links?.second
+                                val artistLink = links?.first
 
                                 val message = buildString {
-                                    append("<b>$record</b></font><br><br>")
                                     append("Released $year - $country<br><br>")
                                     append("$format<br><br>")
                                     append("Label: $label<br><br>")
                                     append("Genre: $genre<br>")
-                                    append("Style: $style<br><br>")
-                                    append("$numForSale copies listed, starting at $lowestPrice<br>")
+                                    append("Style: $style<br>")
                                 }
 
                                 val newRecord = Record(
@@ -101,7 +102,9 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                     spotifyLink = albumLink ?: "",
                                     timestamp = System.currentTimeMillis(),
                                     averageRating = averageRating ?: "",
-                                    ratingCount = ratingCount ?: ""
+                                    ratingCount = ratingCount ?: "",
+                                    artistImage = artistImage ?: "",
+                                    artistLink = artistLink ?: ""
                                 )
 
                                 val alertDialog = createRecordDetailDialog(

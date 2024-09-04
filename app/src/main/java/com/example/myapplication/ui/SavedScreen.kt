@@ -323,13 +323,11 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
     val db = remember { AppDatabase.getDatabase(context) }
 
     val message = buildString {
-        append("<b>${record.title}</b><br><br>")
         append("Released ${record.year} - ${record.country}<br><br>")
         append("${record.format}<br><br>")
         append("Label: ${record.label}<br><br>")
         append("Genre: ${record.genre}<br>")
-        append("Style: ${record.style}<br><br>")
-        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}<br>")
+        append("Style: ${record.style}<br>")
     }
 
     val alertDialog = createRecordDetailDialog(

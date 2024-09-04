@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -6,26 +7,55 @@
     android:padding="16dp"
     android:background="@drawable/rounded_dialog">
 
-    <ImageView
-        android:id="@+id/dialog_image"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:scaleType="centerInside" />
+        android:layout_height="wrap_content">
 
-    <LinearLayout
+        <ImageView
+            android:id="@+id/dialog_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:background="#333333">
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/artist_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toStartOf="@+id/dialog_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/dialog_message"
+            android:id="@+id/dialog_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="17sp"
-            android:layout_weight="1"/>
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/artist_image"
+            app:layout_constraintEnd_toStartOf="@+id/button_play"
+            app:layout_constraintTop_toTopOf="@+id/artist_image"
+            app:layout_constraintBottom_toBottomOf="@+id/artist_image"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintHorizontal_chainStyle="packed" />
 
         <Button
             android:id="@+id/button_play"
@@ -33,8 +63,33 @@
             android:layout_height="40dp"
             android:background="@drawable/play_button"
             android:textColor="@android:color/transparent"
-            android:layout_marginEnd="15dp"/>
-    </LinearLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/artist_image"/>
+
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@+id/dialog_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="10dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_weight="1"
+        android:layout_marginTop="15dp"/>
 
     <!-- Star Rating at the Bottom -->
     <LinearLayout
@@ -75,11 +130,12 @@
             android:src="@drawable/star_empty" />
     </LinearLayout>
 
-    <!-- Review Text Below the Stars -->
     <TextView
         android:id="@+id/rating_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textSize="17sp" />
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"/>
+
 </LinearLayout>

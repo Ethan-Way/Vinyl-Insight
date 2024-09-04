@@ -16,7 +16,7 @@ class RecordSearch {
 
     fun searchByBarcode(
         barcode: String,
-        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
+        callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
     ) {
         api.searchByQuery(barcode).enqueue(object : Callback<DiscogsResponse> {
             override fun onResponse(
@@ -64,6 +64,8 @@ class RecordSearch {
                                                             album,
                                                             artist
                                                         ) { url ->
+                                                            val spotifyJson = url?.first
+                                                            val artistImage = url?.second
                                                             Handler(Looper.getMainLooper()).post {
                                                                 callback(
                                                                     cleanedRecord,
@@ -76,9 +78,10 @@ class RecordSearch {
                                                                     cover,
                                                                     "$$lowestPrice",
                                                                     numForSale,
-                                                                    url,
+                                                                    spotifyJson,
                                                                     averageRating.toString(),
-                                                                    ratingCount.toString()
+                                                                    ratingCount.toString(),
+                                                                    artistImage
                                                                 )
                                                             }
                                                         }
@@ -95,6 +98,7 @@ class RecordSearch {
                         Handler(Looper.getMainLooper()).post {
                             callback(
                                 "No releases found",
+                                null,
                                 null,
                                 null,
                                 null,
@@ -129,6 +133,7 @@ class RecordSearch {
                             null,
                             null,
                             null,
+                            null,
                             null
                         )
                     }
@@ -140,6 +145,7 @@ class RecordSearch {
                 Handler(Looper.getMainLooper()).post {
                     callback(
                         "Error fetching data",
+                        null,
                         null,
                         null,
                         null,
