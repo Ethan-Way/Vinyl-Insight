@@ -327,8 +327,7 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
         append("${record.format}<br><br>")
         append("Label: ${record.label}<br><br>")
         append("Genre: ${record.genre}<br>")
-        append("Style: ${record.style}<br><br>")
-        append("${record.numForSale} copies listed, starting at ${record.lowestPrice}<br>")
+        append("Style: ${record.style}<br>")
     }
 
     val alertDialog = createRecordDetailDialog(

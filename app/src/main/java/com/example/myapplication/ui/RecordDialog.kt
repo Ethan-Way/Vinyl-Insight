@@ -45,6 +45,7 @@ fun createRecordDetailDialog(
     val messageView = dialogView.findViewById<TextView>(R.id.dialog_message)
     val playButton = dialogView.findViewById<Button>(R.id.button_play)
     val ratingTextView = dialogView.findViewById<TextView>(R.id.rating_text)
+
     Log.d("record", record.artistImage)
 
     val stars = arrayOf(

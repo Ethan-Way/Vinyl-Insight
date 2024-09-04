@@ -85,8 +85,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                     append("$format<br><br>")
                                     append("Label: $label<br><br>")
                                     append("Genre: $genre<br>")
-                                    append("Style: $style<br><br>")
-                                    append("$numForSale copies listed, starting at $lowestPrice<br>")
+                                    append("Style: $style<br>")
                                 }
 
                                 val newRecord = Record(
