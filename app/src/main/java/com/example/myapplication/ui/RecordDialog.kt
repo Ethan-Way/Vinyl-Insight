@@ -10,7 +10,9 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -20,6 +22,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.myapplication.R
 import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
+import com.example.myapplication.utils.parseRecord
 import com.example.myapplication.utils.setRatingStars
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,10 +38,14 @@ fun createRecordDetailDialog(
     onDelete: (() -> Unit)? = null
 ): AlertDialog {
     val dialogView = View.inflate(context, R.layout.dialog_layout, null)
+    val titleView = dialogView.findViewById<TextView>(R.id.dialog_title)
+    val artistView = dialogView.findViewById<TextView>(R.id.artist)
     val imageView = dialogView.findViewById<ImageView>(R.id.dialog_image)
+    val artistImageView = dialogView.findViewById<ImageView>(R.id.artist_image)
     val messageView = dialogView.findViewById<TextView>(R.id.dialog_message)
     val playButton = dialogView.findViewById<Button>(R.id.button_play)
     val ratingTextView = dialogView.findViewById<TextView>(R.id.rating_text)
+    Log.d("record", record.artistImage)
 
     val stars = arrayOf(
         dialogView.findViewById<ImageView>(R.id.star1),
@@ -48,7 +55,19 @@ fun createRecordDetailDialog(
         dialogView.findViewById<ImageView>(R.id.star5)
     )
 
+    val result = parseRecord(record.title)
+    if (result != null) {
+        val (artist, album) = result
+        titleView.text = album
+        artistView.text = artist
+    }
+
     setRatingStars(stars, record.averageRating.toBigDecimal())
+
+    Glide.with(context)
+        .load(record.artistImage)
+        .circleCrop()
+        .into(artistImageView)
 
     Glide.with(context)
         .load(record.cover)
@@ -87,7 +106,8 @@ fun createRecordDetailDialog(
                             }
                         } else {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Record already saved", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Record already saved", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         }
                     }

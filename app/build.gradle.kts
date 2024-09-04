@@ -105,5 +105,4 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose.v200)
     implementation(libs.coil.gif)
-
 }

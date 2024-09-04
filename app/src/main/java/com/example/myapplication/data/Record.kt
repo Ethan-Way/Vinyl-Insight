@@ -19,7 +19,9 @@ data class Record(
     val spotifyLink: String,
     val timestamp: Long,
     val averageRating: String,
-    val ratingCount: String
+    val ratingCount: String,
+    val artistImage: String,
+    val artistLink: String
 ) {
     override fun toString(): String {
         return "$title ($year)"

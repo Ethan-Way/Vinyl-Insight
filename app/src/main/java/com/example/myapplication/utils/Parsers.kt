@@ -34,3 +34,41 @@ fun extractLinks(json: String): Pair<String, String>? {
 
     return null
 }
+
+fun extractArtistApi(json: String): String? {
+    val jsonObject = JSONObject(json)
+    val albums = jsonObject.getJSONObject("albums")
+    val items = albums.getJSONArray("items")
+
+    if (items.length() > 0) {
+        val albumItem = items.getJSONObject(0)
+
+        val artistArray = albumItem.getJSONArray("artists")
+        val artistObject = artistArray.getJSONObject(0)
+
+        val artistCall = artistObject.getString("href")
+
+        return artistCall
+    }
+
+    return null
+}
+
+// get the smallest artist image
+fun extractArtistImage(json: String): String? {
+    val jsonObject = JSONObject(json)
+    val imagesArray = jsonObject.getJSONArray("images")
+    var imageUrl: String? = null
+    var smallestWidth = Int.MAX_VALUE
+
+    for (i in 0 until imagesArray.length()) {
+        val imageObect = imagesArray.getJSONObject(i)
+        val width = imageObect.getInt("width")
+
+        if (width < smallestWidth) {
+            smallestWidth = width
+            imageUrl = imageObect.getString("url")
+        }
+    }
+    return imageUrl
+}
