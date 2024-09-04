@@ -3,10 +3,10 @@ package com.example.myapplication.ui
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import android.util.Log
+import com.example.myapplication.R
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -34,6 +34,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.utils.BarCodeAnalyzer
+import androidx.compose.foundation.Image
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 
 @Composable
 fun CameraScreen(navController: NavController) {
@@ -81,7 +87,6 @@ fun CameraScreen(navController: NavController) {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Display a loading indicator when processing
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Box(
@@ -89,11 +94,25 @@ fun CameraScreen(navController: NavController) {
                         .fillMaxSize()
                         .background(color = Color.Black.copy(alpha = 0.8f))
                 )
-                CircularProgressIndicator(
-                    color = Color.White
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.loading)
+                            .decoderFactory(
+                                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                                    ImageDecoderDecoder.Factory()
+                                } else {
+                                    GifDecoder.Factory()
+                                }
+                            )
+                            .size(Size.ORIGINAL)
+                            .build()
+                    ),
+                    contentDescription = "Loading...",
                 )
             }
         }
+
 
         Button(
             onClick = { navController.navigate("savedScreen") },

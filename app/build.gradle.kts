@@ -103,7 +103,7 @@ dependencies {
     implementation(libs.androidx.animation)
     implementation(libs.coil.compose)
     implementation("androidx.compose.material:material-icons-extended")
-
-
+    implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("io.coil-kt:coil-gif:2.0.0")
 
 }
