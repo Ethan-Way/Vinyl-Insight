@@ -11,8 +11,8 @@ import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -45,6 +45,7 @@ fun createRecordDetailDialog(
     val messageView = dialogView.findViewById<TextView>(R.id.dialog_message)
     val playButton = dialogView.findViewById<Button>(R.id.button_play)
     val ratingTextView = dialogView.findViewById<TextView>(R.id.rating_text)
+    val priceTextView = dialogView.findViewById<TextView>(R.id.price_text)
 
     Log.d("record", record.artistImage)
 
@@ -70,6 +71,12 @@ fun createRecordDetailDialog(
         .circleCrop()
         .into(artistImageView)
 
+    artistImageView.setOnClickListener {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(record.artistLink)
+        context.startActivity(intent)
+    }
+
     Glide.with(context)
         .load(record.cover)
         .apply(RequestOptions().centerCrop())
@@ -78,6 +85,7 @@ fun createRecordDetailDialog(
     messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
     messageView.movementMethod = LinkMovementMethod.getInstance()
     ratingTextView.text = "Rated ${record.averageRating} by ${record.ratingCount} users"
+    priceTextView.text =  "${record.numForSale} copies listed, starting at ${record.lowestPrice}"
 
     playButton.setOnClickListener {
         record.spotifyLink.let {
@@ -139,6 +147,13 @@ fun createRecordDetailDialog(
                 Color.TRANSPARENT
             )
         )
+
+        val window = alertDialog.window
+        window?.let {
+            it.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            it.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            it.statusBarColor = Color.TRANSPARENT
+        }
 
         val positiveButton =
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)

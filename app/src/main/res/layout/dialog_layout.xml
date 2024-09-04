@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@drawable/rounded_dialog">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/dialog_image"
@@ -27,15 +26,17 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp">
 
         <ImageView
             android:id="@+id/artist_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:scaleType="centerCrop"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintEnd_toStartOf="@+id/dialog_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -59,20 +60,21 @@
 
         <Button
             android:id="@+id/button_play"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="@drawable/play_button"
             android:textColor="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/artist_image"/>
+            app:layout_constraintBottom_toBottomOf="@+id/artist_image"
+            android:layout_marginEnd="16dp"/>
 
         <TextView
             android:id="@+id/artist"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textSize="17sp"
             app:layout_constraintStart_toStartOf="@+id/dialog_title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dialog_title"
@@ -81,23 +83,23 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <TextView
         android:id="@+id/dialog_message"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textSize="17sp"
         android:layout_weight="1"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="16dp" />
 
-    <!-- Star Rating at the Bottom -->
     <LinearLayout
         android:id="@+id/rating_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="start">
+        android:gravity="start"
+        android:layout_marginStart="16dp">
 
         <ImageView
             android:id="@+id/star1"
@@ -135,7 +137,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginTop="4dp"/>
+        android:textSize="17sp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/price_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="40dp"/>
 
 </LinearLayout>
