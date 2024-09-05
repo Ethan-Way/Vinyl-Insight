@@ -28,7 +28,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp">
 
         <ImageView
             android:id="@+id/artist_image"
@@ -53,10 +54,10 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/artist_image"
             app:layout_constraintEnd_toStartOf="@+id/button_play"
-            app:layout_constraintTop_toTopOf="@+id/artist_image"
-            app:layout_constraintBottom_toBottomOf="@+id/artist_image"
+            app:layout_constraintBaseline_toBaselineOf="@+id/artist_image"
             app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintHorizontal_chainStyle="packed" />
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:layout_marginTop="10dp"/>
 
         <Button
             android:id="@+id/button_play"
@@ -147,7 +148,7 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:textSize="17sp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="40dp"/>
 
