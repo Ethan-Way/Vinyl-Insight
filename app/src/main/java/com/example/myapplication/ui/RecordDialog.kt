@@ -6,14 +6,17 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import android.util.TypedValue
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -46,8 +49,40 @@ fun createRecordDetailDialog(
     val playButton = dialogView.findViewById<Button>(R.id.button_play)
     val ratingTextView = dialogView.findViewById<TextView>(R.id.rating_text)
     val priceTextView = dialogView.findViewById<TextView>(R.id.price_text)
+    val genreTextView = dialogView.findViewById<TextView>(R.id.genre_text)
+    val styleContainer = dialogView.findViewById<LinearLayout>(R.id.style_container)
 
-    Log.d("record", record.artistImage)
+
+    genreTextView.text = record.genre
+    genreTextView.setPadding(16, 16, 16, 16)
+    genreTextView.setTextColor(Color.parseColor("#FF333333"))
+    genreTextView.background = ContextCompat.getDrawable(context, R.drawable.rounded_style)
+    genreTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+    genreTextView.layoutParams = LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.WRAP_CONTENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    ).apply {
+        marginEnd = 16
+    }
+
+    // Clear existing style boxes and create new ones
+    styleContainer.removeAllViews()
+    record.style.split(", ").forEach { style ->
+        val styleTextView = TextView(context).apply {
+            text = style
+            setPadding(16, 16, 16, 16)
+            setTextColor(Color.parseColor("#FF333333"))
+            background = ContextCompat.getDrawable(context, R.drawable.rounded_style)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginEnd = 16
+            }
+        }
+        styleContainer.addView(styleTextView)
+    }
 
     val stars = arrayOf(
         dialogView.findViewById<ImageView>(R.id.star1),

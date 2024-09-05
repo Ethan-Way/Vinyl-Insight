@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/rounded_dialog">
+    android:background="#333333">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -22,6 +22,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/dialog_image"
+            app:layout_constraintBottom_toBottomOf="@id/dialog_image"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/transparent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -38,7 +51,6 @@
             android:scaleType="centerCrop"
             android:clickable="true"
             android:focusable="true"
-            app:layout_constraintEnd_toStartOf="@+id/dialog_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="16dp"
@@ -46,18 +58,19 @@
             android:layout_marginBottom="10dp" />
 
         <TextView
-            android:id="@+id/dialog_title"
+            android:id="@+id/artist"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
+            android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/artist_image"
-            app:layout_constraintEnd_toStartOf="@+id/button_play"
-            app:layout_constraintBaseline_toBaselineOf="@+id/artist_image"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            android:layout_marginTop="10dp"/>
+            app:layout_constraintStart_toEndOf="@id/artist_image"
+            app:layout_constraintTop_toTopOf="@id/artist_image"
+            app:layout_constraintBottom_toBottomOf="@id/artist_image"
+            app:layout_constraintEnd_toStartOf="@id/button_play"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="10dp" />
 
         <Button
             android:id="@+id/button_play"
@@ -70,29 +83,41 @@
             app:layout_constraintBottom_toBottomOf="@+id/artist_image"
             android:layout_marginEnd="16dp"/>
 
-        <TextView
-            android:id="@+id/artist"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="17sp"
-            app:layout_constraintStart_toStartOf="@+id/dialog_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_title"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="10dp"/>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/dialog_message"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:textColor="#FFFFFF"
+        android:textColor="#DDDDDD"
         android:textSize="17sp"
         android:layout_weight="1"
         android:layout_marginTop="15dp"
         android:layout_marginStart="16dp" />
+
+    <LinearLayout
+        android:id="@+id/genre_style_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/genre_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/rounded_style"
+            android:layout_marginEnd="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/style_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/rating_container"
@@ -137,7 +162,7 @@
         android:id="@+id/rating_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
+        android:textColor="#DDDDDD"
         android:textSize="17sp"
         android:layout_marginTop="4dp"
         android:layout_marginStart="16dp" />
@@ -146,7 +171,7 @@
         android:id="@+id/price_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
+        android:textColor="#DDDDDD"
         android:textSize="17sp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"

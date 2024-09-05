@@ -324,9 +324,7 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
     val message = buildString {
         append("Released ${record.year} - ${record.country}<br><br>")
         append("${record.format}<br><br>")
-        append("Label: ${record.label}<br><br>")
-        append("Genre: ${record.genre}<br>")
-        append("Style: ${record.style}<br>")
+        append("Label: ${record.label}")
     }
 
     val alertDialog = createRecordDetailDialog(
