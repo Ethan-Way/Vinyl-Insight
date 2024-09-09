@@ -9,7 +9,6 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
 import com.example.myapplication.ui.createRecordDetailDialog
 
@@ -28,8 +27,6 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
     private val scanInterval: Long = 5000
 
     private val recordSearch = RecordSearch()
-
-    private val db = AppDatabase.getDatabase(context)
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
