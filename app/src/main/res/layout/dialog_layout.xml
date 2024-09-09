@@ -3,8 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="#333333">
+    android:background="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -26,7 +27,7 @@
             android:id="@+id/dialog_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/dialog_image"
@@ -61,7 +62,7 @@
             android:id="@+id/artist"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/artist_image"
@@ -89,7 +90,7 @@
         android:id="@+id/dialog_message"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:textColor="#DDDDDD"
+        android:textColor="@color/secondary_text"
         android:textSize="17sp"
         android:layout_weight="1"
         android:layout_marginTop="15dp"
@@ -102,20 +103,12 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/genre_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/rounded_style"
-            android:layout_marginEnd="8dp"/>
-
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/style_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"/>
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start" />
     </LinearLayout>
 
 
@@ -162,7 +155,7 @@
         android:id="@+id/rating_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#DDDDDD"
+        android:textColor="@color/secondary_text"
         android:textSize="17sp"
         android:layout_marginTop="4dp"
         android:layout_marginStart="16dp" />
@@ -171,7 +164,7 @@
         android:id="@+id/price_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#DDDDDD"
+        android:textColor="@color/secondary_text"
         android:textSize="17sp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"

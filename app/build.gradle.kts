@@ -105,4 +105,5 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose.v200)
     implementation(libs.coil.gif)
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }
