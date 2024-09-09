@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -88,7 +89,7 @@ fun SavedScreen(navController: NavController) {
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("main") }) {
                         Icon(
-                            Icons.Filled.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = colorResource(id = R.color.primary_text)
                         )
@@ -322,7 +323,6 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
 @Composable
 fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Unit) {
     val context = LocalContext.current
-    val db = remember { AppDatabase.getDatabase(context) }
 
     val message = buildString {
         append("Released ${record.year} - ${record.country}<br><br>")

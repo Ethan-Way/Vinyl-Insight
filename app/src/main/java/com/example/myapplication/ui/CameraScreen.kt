@@ -126,7 +126,7 @@ fun CameraScreen(navController: NavController) {
                 .width(70.dp)
                 .height(70.dp)
                 .padding(top = 20.dp, end = 20.dp),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(50.dp),
             contentPadding = PaddingValues(0.dp)
 
         ) {
