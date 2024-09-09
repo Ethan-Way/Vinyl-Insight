@@ -4,5 +4,5 @@
     <color name="primary_text">#FFFFFFFF</color>
     <color name="secondary_text">#FFADADAD</color>
     <color name="bubble">#FF3b3b3b</color>
-    <color name="text_shadow">#FF80000000</color>
+    <color name="text_shadow">#FF000000</color>
 </resources>
