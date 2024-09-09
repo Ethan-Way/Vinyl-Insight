@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import android.app.Activity
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +36,11 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.utils.BarCodeAnalyzer
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
+import androidx.core.view.WindowCompat
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -44,11 +49,23 @@ import coil.size.Size
 
 @Composable
 fun CameraScreen(navController: NavController) {
+    val windowContext = LocalContext.current
+    val activity = windowContext as? Activity
+    val view = LocalView.current
+
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(localContext)
     }
+
+    LaunchedEffect(Unit) {
+        activity?.window?.let { window ->
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.statusBarColor = Color.Transparent.toArgb()
+        }
+    }
+
 
     // Manage the loading state
     var isLoading by remember { mutableStateOf(false) }
@@ -114,7 +131,6 @@ fun CameraScreen(navController: NavController) {
             }
         }
 
-
         Button(
             onClick = { navController.navigate("savedScreen") },
             colors = ButtonDefaults.buttonColors(
@@ -122,7 +138,8 @@ fun CameraScreen(navController: NavController) {
                 contentColor = colorResource(id = R.color.primary_text)
             ),
             modifier = Modifier
-                .align(Alignment.TopEnd)
+                .align(alignment = Alignment.TopEnd)
+                .offset(y=30.dp)
                 .width(70.dp)
                 .height(70.dp)
                 .padding(top = 20.dp, end = 20.dp),
