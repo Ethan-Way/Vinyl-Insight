@@ -81,7 +81,7 @@ fun createRecordDetailDialog(
     val result = parseRecord(record.title)
     if (result != null) {
         val (artist, album) = result
-        titleView.text = album
+        titleView.text = buildString { append("$album ") }
         artistView.text = artist
     }
 
@@ -105,8 +105,8 @@ fun createRecordDetailDialog(
 
     messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
     messageView.movementMethod = LinkMovementMethod.getInstance()
-    ratingTextView.text = "Rated ${record.averageRating} by ${record.ratingCount} users"
-    priceTextView.text = "${record.numForSale} copies listed, starting at ${record.lowestPrice}"
+    ratingTextView.text = buildString { append("Rated ${record.averageRating} by ${record.ratingCount} users") }
+    priceTextView.text = buildString { append("${record.numForSale} copies listed, starting at ${record.lowestPrice}") }
 
     playButton.setOnClickListener {
         record.spotifyLink.let {
