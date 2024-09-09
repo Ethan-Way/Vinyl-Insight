@@ -74,7 +74,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                         if (currentTime - lastScan > scanInterval) {
                             onLoading(true)
 
-                            recordSearch.searchByBarcode(result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
+                            recordSearch.searchByBarcode(context, result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
 
                                 val links = url?.let { extractLinks(it) }
                                 val albumLink = links?.second

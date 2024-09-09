@@ -1,5 +1,6 @@
 package com.example.myapplication.utils
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -9,12 +10,14 @@ import com.example.myapplication.data.RatingResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.widget.Toast
 
 class RecordSearch {
 
     private val api = DiscogsClient.discogsApi
 
     fun searchByBarcode(
+        context: Context,
         barcode: String,
         callback: (String, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?, String?) -> Unit
     ) {
@@ -27,7 +30,8 @@ class RecordSearch {
                     val releases = response.body()?.results
                     if (!releases.isNullOrEmpty()) {
                         val matchedRecord = releases.find { release ->
-                            release.barcode?.contains(barcode) == true
+                            val releaseBarcodes = release.barcode?.map { it.replace(" ", "") }
+                            releaseBarcodes?.contains(barcode) == true
                         }
 
                         if (matchedRecord != null) {
@@ -38,9 +42,7 @@ class RecordSearch {
                             val label = matchedRecord.label!!.first()
                             val genre = matchedRecord.genre?.first()
                             val style = matchedRecord.style
-
                             val cover = releases.first().coverImageUrl
-
                             val masterUrl = releases.first().masterUrl
 
                             val cleanedRecord = record.replace(Regex("\\s*\\(.*\\)"), "")
@@ -52,9 +54,9 @@ class RecordSearch {
                             val cleanedStyle = style?.joinToString(separator = ", ")
 
                             if (masterUrl != null) {
-                                fetchLowestPrice(masterUrl) { lowestPrice, numForSale, mainReleaseUrl ->
+                                fetchLowestPrice(context, masterUrl) { lowestPrice, numForSale, mainReleaseUrl ->
                                     if (mainReleaseUrl != null) {
-                                        fetchRating(mainReleaseUrl) { averageRating, ratingCount ->
+                                        fetchRating(context, mainReleaseUrl) { averageRating, ratingCount ->
                                             if (result != null) {
                                                 val (artist, album) = result
                                                 SpotifyUtils.getSpotifyAccessToken { token ->
@@ -96,6 +98,7 @@ class RecordSearch {
 
                     } else {
                         Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(context, "No releases found", Toast.LENGTH_SHORT).show()
                             callback(
                                 "No releases found",
                                 null,
@@ -115,11 +118,9 @@ class RecordSearch {
                         }
                     }
                 } else {
-                    Log.e(
-                        "DiscogsRepository",
-                        "Response error: ${response.errorBody()?.string()}"
-                    )
+                    Log.e("DiscogsRepository", "Response error: ${response.errorBody()?.string()}")
                     Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context, "Error fetching data", Toast.LENGTH_SHORT).show()
                         callback(
                             "Error fetching data",
                             null,
@@ -143,6 +144,7 @@ class RecordSearch {
             override fun onFailure(call: Call<DiscogsResponse>, t: Throwable) {
                 Log.e("DiscogsRepository", "Network error: ${t.localizedMessage}")
                 Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "Network error occurred", Toast.LENGTH_SHORT).show()
                     callback(
                         "Error fetching data",
                         null,
@@ -164,7 +166,11 @@ class RecordSearch {
         })
     }
 
-    private fun fetchLowestPrice(masterUrl: String, callback: (String?, String?, String?) -> Unit) {
+    private fun fetchLowestPrice(
+        context: Context,
+        masterUrl: String,
+        callback: (String?, String?, String?) -> Unit
+    ) {
         api.getMasterDetails(masterUrl).enqueue(object : Callback<MasterDetailsResponse> {
             override fun onResponse(
                 call: Call<MasterDetailsResponse>,
@@ -173,7 +179,7 @@ class RecordSearch {
                 if (response.isSuccessful) {
                     val lowestPrice = response.body()?.lowestPrice?.toString()
                     val numForSale = response.body()?.numForSale?.toString()
-                    val mainReleaseUrl = response.body()?.mainReleaseUrl?.toString()
+                    val mainReleaseUrl = response.body()?.mainReleaseUrl
 
                     Handler(Looper.getMainLooper()).post {
                         callback(lowestPrice, numForSale, mainReleaseUrl)
@@ -181,6 +187,7 @@ class RecordSearch {
                 } else {
                     Log.e("API Error", "Unsuccessful response: ${response.errorBody()?.string()}")
                     Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context, "Failed to fetch lowest price", Toast.LENGTH_SHORT).show()
                         callback(null, null, null)
                     }
                 }
@@ -188,15 +195,19 @@ class RecordSearch {
 
             override fun onFailure(call: Call<MasterDetailsResponse>, t: Throwable) {
                 Log.e("API Failure", "Failed to fetch data: ${t.message}")
-                // Call the callback with error on the main thread
                 Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "Failed to fetch lowest price", Toast.LENGTH_SHORT).show()
                     callback(null, null, null)
                 }
             }
         })
     }
 
-    fun fetchRating(mainReleaseUrl: String, callback: (Double?, Int?) -> Unit) {
+    fun fetchRating(
+        context: Context,
+        mainReleaseUrl: String,
+        callback: (Double?, Int?) -> Unit
+    ) {
         val ratingUrl = "$mainReleaseUrl/rating"
         api.getRating(ratingUrl).enqueue(object : Callback<RatingResponse> {
             override fun onResponse(call: Call<RatingResponse>, response: Response<RatingResponse>) {
@@ -209,6 +220,7 @@ class RecordSearch {
                 } else {
                     Log.e("API Error", "Unsuccessful response: ${response.errorBody()?.string()}")
                     Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context, "Failed to fetch rating", Toast.LENGTH_SHORT).show()
                         callback(null, null)
                     }
                 }
@@ -217,10 +229,10 @@ class RecordSearch {
             override fun onFailure(call: Call<RatingResponse>, t: Throwable) {
                 Log.e("API Failure", "Failed to fetch data: ${t.message}")
                 Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "Failed to fetch rating", Toast.LENGTH_SHORT).show()
                     callback(null, null)
                 }
             }
         })
     }
-
 }
