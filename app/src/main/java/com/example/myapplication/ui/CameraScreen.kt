@@ -35,6 +35,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.utils.BarCodeAnalyzer
 import androidx.compose.foundation.Image
+import androidx.compose.ui.res.colorResource
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
@@ -117,8 +118,8 @@ fun CameraScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate("savedScreen") },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(51, 51, 51),
-                contentColor = Color.White
+                containerColor = colorResource(id = R.color.background),
+                contentColor = colorResource(id = R.color.primary_text)
             ),
             modifier = Modifier
                 .align(Alignment.TopEnd)
