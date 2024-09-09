@@ -51,7 +51,6 @@ import coil.size.Size
 fun CameraScreen(navController: NavController) {
     val windowContext = LocalContext.current
     val activity = windowContext as? Activity
-    val view = LocalView.current
 
     val localContext = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
