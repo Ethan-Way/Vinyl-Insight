@@ -6,14 +6,16 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.util.Log
+import android.util.TypedValue
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -24,6 +26,7 @@ import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
 import com.example.myapplication.utils.parseRecord
 import com.example.myapplication.utils.setRatingStars
+import com.google.android.flexbox.FlexboxLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,14 +49,32 @@ fun createRecordDetailDialog(
     val playButton = dialogView.findViewById<Button>(R.id.button_play)
     val ratingTextView = dialogView.findViewById<TextView>(R.id.rating_text)
     val priceTextView = dialogView.findViewById<TextView>(R.id.price_text)
+    val styleContainer = dialogView.findViewById<FlexboxLayout>(R.id.style_container)
 
-    Log.d("record", record.artistImage)
+
+    record.style.split(", ").forEach { style ->
+        val styleTextView = TextView(context).apply {
+            text = style
+            setPadding(16, 16, 16, 16)
+            setTextColor(ContextCompat.getColor(context, R.color.primary_text))
+            background = ContextCompat.getDrawable(context, R.drawable.rounded_style)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                marginEnd = 16
+            }
+        }
+        styleContainer.addView(styleTextView)
+    }
+
 
     val stars = arrayOf(
-        dialogView.findViewById<ImageView>(R.id.star1),
-        dialogView.findViewById<ImageView>(R.id.star2),
-        dialogView.findViewById<ImageView>(R.id.star3),
-        dialogView.findViewById<ImageView>(R.id.star4),
+        dialogView.findViewById(R.id.star1),
+        dialogView.findViewById(R.id.star2),
+        dialogView.findViewById(R.id.star3),
+        dialogView.findViewById(R.id.star4),
         dialogView.findViewById<ImageView>(R.id.star5)
     )
 
@@ -85,7 +106,7 @@ fun createRecordDetailDialog(
     messageView.text = Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
     messageView.movementMethod = LinkMovementMethod.getInstance()
     ratingTextView.text = "Rated ${record.averageRating} by ${record.ratingCount} users"
-    priceTextView.text =  "${record.numForSale} copies listed, starting at ${record.lowestPrice}"
+    priceTextView.text = "${record.numForSale} copies listed, starting at ${record.lowestPrice}"
 
     playButton.setOnClickListener {
         record.spotifyLink.let {
@@ -101,7 +122,7 @@ fun createRecordDetailDialog(
             onDismiss()
         }.apply {
             onSave?.let {
-                setNegativeButton("Save") { _, _ ->
+                setNeutralButton("Save") { _, _ ->
                     CoroutineScope(Dispatchers.IO).launch {
                         val db = AppDatabase.getDatabase(context)
                         val recordDao = db.recordDao()
@@ -124,7 +145,7 @@ fun createRecordDetailDialog(
             }
 
             onDelete?.let {
-                setNegativeButton("Remove") { dialog: DialogInterface, _: Int ->
+                setNeutralButton("Remove") { dialog: DialogInterface, _: Int ->
                     CoroutineScope(Dispatchers.IO).launch {
                         val db = AppDatabase.getDatabase(context)
                         val recordDao = db.recordDao()
@@ -155,22 +176,32 @@ fun createRecordDetailDialog(
             it.statusBarColor = Color.TRANSPARENT
         }
 
+        val neutralButton =
+            alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+        neutralButton.setTextColor(
+            ContextCompat.getColor(context, R.color.primary_text)
+        )
+        neutralButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+        neutralButton.setPadding(16, 16, 16, 16)
+
+
         val positiveButton =
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
         positiveButton.setTextColor(
-            ContextCompat.getColor(
-                context,
-                R.color.white
-            )
+            ContextCompat.getColor(context, R.color.primary_text)
         )
-        val negativeButton =
-            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(
-            ContextCompat.getColor(
-                context,
-                R.color.white
-            )
-        )
+        positiveButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
+        positiveButton.setPadding(16, 16, 16, 16)
+
+        positiveButton.background = ContextCompat.getDrawable(context, R.drawable.rounded_style)
+        neutralButton.background = ContextCompat.getDrawable(context, R.drawable.rounded_style)
+
+        positiveButton.isAllCaps = false
+        neutralButton.isAllCaps = false
+
+        positiveButton.typeface = Typeface.DEFAULT
+        neutralButton.typeface = Typeface.DEFAULT
+
     }
     return alertDialog
 }

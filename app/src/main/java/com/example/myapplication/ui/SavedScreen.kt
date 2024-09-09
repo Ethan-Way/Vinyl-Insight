@@ -20,12 +20,15 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.R
 import com.example.myapplication.data.AppDatabase
 import com.example.myapplication.data.Record
 import com.example.myapplication.data.RecordDao
@@ -46,7 +49,7 @@ fun SavedScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         activity?.window?.let { window ->
             WindowCompat.getInsetsController(window, view).apply {
-                window.statusBarColor = Color(51, 51, 51).toArgb()
+                window.statusBarColor = ContextCompat.getColor(context, R.color.background)
             }
         }
     }
@@ -77,7 +80,7 @@ fun SavedScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(75, 75, 75))
+            .background(color = colorResource(id = R.color.bubble))
     ) {
         item {
             TopAppBar(
@@ -87,7 +90,7 @@ fun SavedScreen(navController: NavController) {
                         Icon(
                             Icons.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = colorResource(id = R.color.primary_text)
                         )
                     }
                 },
@@ -106,7 +109,7 @@ fun SavedScreen(navController: NavController) {
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
-                            contentColor = Color.White
+                            contentColor = colorResource(id = R.color.primary_text)
                         ),
                         modifier = Modifier
                             .width(80.dp),
@@ -121,8 +124,8 @@ fun SavedScreen(navController: NavController) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(51, 51, 51),
-                    titleContentColor = Color.White
+                    containerColor = colorResource(id = R.color.background),
+                    titleContentColor = colorResource(id = R.color.primary_text)
                 )
             )
         }
@@ -144,7 +147,7 @@ fun SavedScreen(navController: NavController) {
                                     text = letter.toString(),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = colorResource(id = R.color.primary_text),
                                     modifier = Modifier.align(Alignment.Center)
                                 )
                             }
@@ -177,7 +180,7 @@ fun SavedScreen(navController: NavController) {
                                     text = letter.toString(),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = colorResource(id = R.color.primary_text),
                                     modifier = Modifier.align(Alignment.Center)
                                 )
                             }
@@ -210,7 +213,7 @@ fun SavedScreen(navController: NavController) {
                                 text = date,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = colorResource(id = R.color.primary_text),
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
@@ -261,7 +264,7 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
                 .fillMaxWidth()
                 .padding(vertical = 1.dp)
                 .clickable { onClick() }
-                .background(color = Color(51, 51, 51))
+                .background(color = colorResource(id = R.color.background))
         ) {
             Image(
                 painter = rememberAsyncImagePainter(model = record.cover),
@@ -281,7 +284,7 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
                     text = album,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = colorResource(id = R.color.primary_text),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -290,7 +293,7 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
                 Text(
                     text = artist,
                     fontSize = 14.sp,
-                    color = Color.White,
+                    color = colorResource(id = R.color.primary_text),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -298,7 +301,7 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
                 Text(
                     text = "Format: " + record.format,
                     fontSize = 14.sp,
-                    color = Color.White,
+                    color = colorResource(id = R.color.primary_text),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -306,7 +309,7 @@ fun RecordItem(record: Record, onClick: () -> Unit) {
                 Text(
                     text = "Released: " + record.year,
                     fontSize = 14.sp,
-                    color = Color.White,
+                    color = colorResource(id = R.color.primary_text),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -324,9 +327,7 @@ fun RecordDetailDialog(record: Record, onDismiss: () -> Unit, onDelete: () -> Un
     val message = buildString {
         append("Released ${record.year} - ${record.country}<br><br>")
         append("${record.format}<br><br>")
-        append("Label: ${record.label}<br><br>")
-        append("Genre: ${record.genre}<br>")
-        append("Style: ${record.style}<br>")
+        append("Label: ${record.label}")
     }
 
     val alertDialog = createRecordDetailDialog(

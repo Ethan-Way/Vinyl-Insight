@@ -83,9 +83,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                 val message = buildString {
                                     append("Released $year - $country<br><br>")
                                     append("$format<br><br>")
-                                    append("Label: $label<br><br>")
-                                    append("Genre: $genre<br>")
-                                    append("Style: $style<br>")
+                                    append("Label: $label")
                                 }
 
                                 val newRecord = Record(
