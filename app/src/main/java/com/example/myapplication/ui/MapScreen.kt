@@ -8,8 +8,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,6 +38,9 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -46,12 +57,10 @@ fun MapScreen(navController: NavController) {
     }
 
     val placesClient = Places.createClient(context)
-    var nearbyStores by remember {
-        mutableStateOf<List<Place>>(emptyList())
-    }
+    var nearbyStores by remember { mutableStateOf<List<Place>>(emptyList()) }
 
     val mapStyle = remember {
-        val inputStream = context.resources.openRawResource(R.raw.dark_mode_style)
+        val inputStream = context.resources.openRawResource(R.raw.map_style)
         inputStream.bufferedReader().use { it.readText() }
     }
 
@@ -106,9 +115,12 @@ fun MapScreen(navController: NavController) {
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
-                    myLocationButtonEnabled = true
+                    myLocationButtonEnabled = false
                 ),
-                properties = MapProperties(isMyLocationEnabled = locationPermission.status.isGranted, mapStyleOptions = MapStyleOptions(mapStyle))
+                properties = MapProperties(
+                    isMyLocationEnabled = locationPermission.status.isGranted,
+                    mapStyleOptions = MapStyleOptions(mapStyle)
+                )
             ) {
                 nearbyStores.forEach { store ->
                     store.latLng?.let {
@@ -120,6 +132,37 @@ fun MapScreen(navController: NavController) {
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = {
+                userLocation?.let { location ->
+                    coroutineScope.launch {
+                        cameraPositionState.animate(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(location.latitude, location.longitude), 14f
+                            )
+                        )
+                    }
+                }
+            },
+            containerColor = colorResource(id = R.color.background),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .offset(y = 105.dp)
+                .width(70.dp)
+                .height(70.dp)
+                .padding(top = 20.dp, start = 20.dp),
+            shape = RoundedCornerShape(50.dp),
+            ) {
+            Icon(
+                imageVector = Icons.Filled.MyLocation,
+                contentDescription = "My Location",
+                modifier = Modifier
+                    .size(25.dp),
+                tint = colorResource(id = R.color.primary_text)
+            )
         }
     }
 }

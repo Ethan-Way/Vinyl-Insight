@@ -28,7 +28,7 @@ fun searchNearbyStores(
 ) {
     val placeFields = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
 
-    val result = calculateRectangle(10, location)
+    val result = calculateRectangle(20, location)
 
     val rectangle = RectangularBounds.newInstance(result.first, result.second)
 
