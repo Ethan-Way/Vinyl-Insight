@@ -37,8 +37,8 @@ import androidx.navigation.NavController
 import com.example.myapplication.utils.BarCodeAnalyzer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
 import androidx.core.view.WindowCompat
 import coil.compose.rememberAsyncImagePainter
@@ -138,7 +138,7 @@ fun CameraScreen(navController: NavController) {
             ),
             modifier = Modifier
                 .align(alignment = Alignment.TopEnd)
-                .offset(y=30.dp)
+                .offset(y=35.dp)
                 .width(70.dp)
                 .height(70.dp)
                 .padding(top = 20.dp, end = 20.dp),
@@ -149,6 +149,30 @@ fun CameraScreen(navController: NavController) {
             Icon(
                 imageVector = Icons.Filled.Bookmark,
                 contentDescription = "Bookmark",
+                modifier = Modifier
+                    .size(25.dp)
+            )
+        }
+
+        Button(
+            onClick = { navController.navigate("mapScreen") },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id = R.color.background),
+                contentColor = colorResource(id = R.color.primary_text)
+            ),
+            modifier = Modifier
+                .align(alignment = Alignment.TopStart)
+                .offset(y=35.dp)
+                .width(70.dp)
+                .height(70.dp)
+                .padding(top = 20.dp, start = 20.dp),
+            shape = RoundedCornerShape(50.dp),
+            contentPadding = PaddingValues(0.dp)
+
+        ) {
+            Icon(
+                imageVector = Icons.Filled.LocationOn,
+                contentDescription = "Map",
                 modifier = Modifier
                     .size(25.dp)
             )
