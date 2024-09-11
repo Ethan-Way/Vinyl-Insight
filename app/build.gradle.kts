@@ -28,6 +28,7 @@ android {
         buildConfigField("String", "spotifyClientId", localProperties["spotifyClientId"].toString())
         buildConfigField("String", "spotifyClientSecret", localProperties["spotifyClientSecret"].toString())
         buildConfigField("String", "discogsAccessToken", localProperties["discogsAccessToken"].toString())
+        buildConfigField("String", "googleMapsApiKey", localProperties["googleMapsApiKey"].toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
