@@ -110,6 +110,6 @@ fun isStoreOpen(place: Place): AnnotatedString {
             AnnotatedString("Closed")
         }
     } else {
-       return AnnotatedString("Hours not available")
+       return AnnotatedString("")
     }
 }

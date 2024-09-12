@@ -2,7 +2,9 @@ package com.example.myapplication.ui
 
 import com.example.myapplication.BuildConfig
 import android.Manifest
+import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.isStoreOpen
+import androidx.core.content.ContextCompat.startActivity
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
@@ -207,7 +210,7 @@ fun MapScreen(navController: NavController) {
                     store.name?.let {
                         Text(
                             text = it,
-                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold),
                             modifier = Modifier.padding(bottom = 16.dp)
 
                         )
@@ -234,7 +237,27 @@ fun MapScreen(navController: NavController) {
                     val isOpen = isStoreOpen(place = store)
                     Text(
                         text = isOpen,
+                        modifier = Modifier.padding(bottom = 5.dp)
                     )
+
+                    Button(
+                        onClick = {
+                            val uri = Uri.parse("google.navigation:q=${store.address}")
+                            val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
+                            buttonIntent.setPackage("com.google.android.apps.maps")
+                            context.startActivity(buttonIntent)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(id = R.color.bubble),
+                            contentColor = colorResource(id = R.color.primary_text)
+                        ),
+                        shape = RoundedCornerShape(50.dp)
+                    ) {
+                        Text(
+                            text = "Directions",
+                            style = TextStyle(fontSize = 17.sp)
+                        )
+                    }
                 }
             }
         }
