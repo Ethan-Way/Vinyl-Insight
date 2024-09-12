@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.isStoreOpen
-import androidx.core.content.ContextCompat.startActivity
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
@@ -203,7 +202,7 @@ fun MapScreen(navController: NavController) {
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(start = 16.dp)
                     .background(colorResource(R.color.background))
             ) {
                 selectedStore?.let { store ->
@@ -240,23 +239,52 @@ fun MapScreen(navController: NavController) {
                         modifier = Modifier.padding(bottom = 5.dp)
                     )
 
-                    Button(
-                        onClick = {
-                            val uri = Uri.parse("google.navigation:q=${store.address}")
-                            val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
-                            buttonIntent.setPackage("com.google.android.apps.maps")
-                            context.startActivity(buttonIntent)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.bubble),
-                            contentColor = colorResource(id = R.color.primary_text)
-                        ),
-                        shape = RoundedCornerShape(50.dp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        Text(
-                            text = "Directions",
-                            style = TextStyle(fontSize = 17.sp)
-                        )
+
+                        Button(
+                            onClick = {
+                                val uri = Uri.parse("google.navigation:q=${store.address}")
+                                val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
+                                buttonIntent.setPackage("com.google.android.apps.maps")
+                                context.startActivity(buttonIntent)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(id = R.color.bubble),
+                                contentColor = colorResource(id = R.color.primary_text)
+                            ),
+                            shape = RoundedCornerShape(50.dp)
+                        ) {
+                            Text(
+                                text = "Directions",
+                                style = TextStyle(fontSize = 17.sp)
+                            )
+                        }
+
+                        if (store.websiteUri != null) {
+                            Button(
+                                onClick = {
+                                    val uri = Uri.parse(store.websiteUri?.toString() ?: "")
+                                    val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
+                                    context.startActivity(buttonIntent)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = colorResource(id = R.color.bubble),
+                                    contentColor = colorResource(id = R.color.primary_text)
+                                ),
+                                shape = RoundedCornerShape(50.dp)
+                            ) {
+                                Text(
+                                    text = "Website",
+                                    style = TextStyle(fontSize = 17.sp)
+                                )
+                            }
+                        }
                     }
                 }
             }

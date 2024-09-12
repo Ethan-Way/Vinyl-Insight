@@ -45,7 +45,8 @@ fun searchNearbyStores(
         Place.Field.ADDRESS,
         Place.Field.RATING,
         Place.Field.OPENING_HOURS,
-        Place.Field.REVIEWS
+        Place.Field.REVIEWS,
+        Place.Field.WEBSITE_URI
     )
 
     val result = calculateRectangle(20, location)
