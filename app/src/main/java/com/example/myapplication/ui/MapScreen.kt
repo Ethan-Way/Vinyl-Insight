@@ -8,12 +8,14 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,13 +23,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
@@ -52,13 +54,18 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.myapplication.utils.StarRating
+import com.example.myapplication.utils.getStoreImages
 import com.example.myapplication.utils.isStoreOpen
+import com.google.android.libraries.places.api.Places.initializeWithNewPlacesApiEnabled
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
@@ -75,12 +82,15 @@ fun MapScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    var storeImages by remember { mutableStateOf<List<String>>(emptyList()) }
 
     if (!Places.isInitialized()) {
         Places.initialize(context, BuildConfig.googleMapsApiKey)
     }
 
-    val placesClient = Places.createClient(context)
+    val placesClient = Places.createClient(context).apply {
+        initializeWithNewPlacesApiEnabled(context, BuildConfig.googleMapsApiKey)
+    }
     var nearbyStores by remember { mutableStateOf<List<Place>>(emptyList()) }
     var selectedStore by remember { mutableStateOf<Place?>(null) }
 
@@ -154,6 +164,11 @@ fun MapScreen(navController: NavController) {
                             snippet = store.address,
                             onClick = {
                                 selectedStore = store
+                                selectedStore?.id?.let { placeId ->
+                                    getStoreImages(placesClient, placeId) { images ->
+                                        storeImages = images
+                                    }
+                                }
                                 showBottomSheet = true
                                 true
                             }
@@ -320,6 +335,33 @@ fun MapScreen(navController: NavController) {
                                     text = "Website",
                                     style = TextStyle(fontSize = 17.sp)
                                 )
+                            }
+                        }
+                    }
+                    // Display images
+                    if (storeImages.isNotEmpty()) {
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            items(storeImages) { imageUrl ->
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .width(120.dp)
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(colorResource(id = R.color.background))
+                                ) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(imageUrl),
+                                        contentDescription = "Store Image",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                    )
+                                }
                             }
                         }
                     }

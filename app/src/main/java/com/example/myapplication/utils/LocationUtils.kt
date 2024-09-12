@@ -1,6 +1,7 @@
 package com.example.myapplication.utils
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.icu.util.LocaleData
 import android.location.Location
 import android.os.Build
@@ -12,7 +13,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import com.example.myapplication.BuildConfig
 import com.example.myapplication.R
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
@@ -22,6 +25,9 @@ import com.google.android.libraries.places.api.net.SearchByTextRequest
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
+import com.google.android.libraries.places.api.net.PlacesStatusCodes
 
 @SuppressLint("MissingPermission")
 fun getUserLocation(
@@ -46,7 +52,8 @@ fun searchNearbyStores(
         Place.Field.RATING,
         Place.Field.OPENING_HOURS,
         Place.Field.REVIEWS,
-        Place.Field.WEBSITE_URI
+        Place.Field.WEBSITE_URI,
+        Place.Field.ID
     )
 
     val result = calculateRectangle(20, location)
@@ -111,6 +118,52 @@ fun isStoreOpen(place: Place): AnnotatedString {
             AnnotatedString("Closed")
         }
     } else {
-       return AnnotatedString("")
+        return AnnotatedString("")
+    }
+}
+fun getStoreImages(
+    placesClient: PlacesClient,
+    placeId: String,
+    onImagesReceived: (List<String>) -> Unit
+) {
+    val fields = listOf(Place.Field.PHOTO_METADATAS)
+    val placeRequest = FetchPlaceRequest.builder(placeId, fields).build()
+
+    placesClient.fetchPlace(placeRequest).addOnSuccessListener { response ->
+        val place = response.place
+        val photoMetadatas = place.photoMetadatas
+
+        if (photoMetadatas.isNullOrEmpty()) {
+            Log.w("TAG", "No photo metadata.")
+            onImagesReceived(emptyList())
+            return@addOnSuccessListener
+        }
+
+        val photoUrls = mutableListOf<String>()
+
+        photoMetadatas.forEach { photoMetadata ->
+            val photoRequest = FetchResolvedPhotoUriRequest.builder(photoMetadata)
+                .setMaxWidth(500)  // Adjust width as needed
+                .setMaxHeight(300) // Adjust height as needed
+                .build()
+
+            placesClient.fetchResolvedPhotoUri(photoRequest).addOnSuccessListener { photoUriResponse ->
+                val photoUri = photoUriResponse.uri.toString()
+                photoUrls.add(photoUri)
+
+                if (photoUrls.size == photoMetadatas.size) {
+                    onImagesReceived(photoUrls)
+                }
+            }.addOnFailureListener { exception ->
+                if (exception is ApiException) {
+                    Log.e("TAG", "Photo fetch failed: ${exception.message}")
+                }
+            }
+        }
+    }.addOnFailureListener { exception ->
+        if (exception is ApiException) {
+            Log.e("TAG", "Place not found: ${exception.message}")
+        }
+        onImagesReceived(emptyList())
     }
 }
