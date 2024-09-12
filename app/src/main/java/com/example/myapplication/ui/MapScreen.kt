@@ -61,7 +61,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.getStoreImages
 import com.example.myapplication.utils.isStoreOpen
