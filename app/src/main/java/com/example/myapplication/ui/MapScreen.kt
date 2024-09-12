@@ -5,9 +5,12 @@ import android.Manifest
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
@@ -40,9 +44,16 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.utils.StarRating
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterial3Api::class,
+)
 @Composable
 fun MapScreen(navController: NavController) {
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -51,6 +62,8 @@ fun MapScreen(navController: NavController) {
     var userLocation by remember { mutableStateOf<Location?>(null) }
     val cameraPositionState = rememberCameraPositionState()
     val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     if (!Places.isInitialized()) {
         Places.initialize(context, BuildConfig.googleMapsApiKey)
@@ -58,6 +71,7 @@ fun MapScreen(navController: NavController) {
 
     val placesClient = Places.createClient(context)
     var nearbyStores by remember { mutableStateOf<List<Place>>(emptyList()) }
+    var selectedStore by remember { mutableStateOf<Place?>(null) }
 
     val mapStyle = remember {
         val inputStream = context.resources.openRawResource(R.raw.map_style)
@@ -86,7 +100,6 @@ fun MapScreen(navController: NavController) {
             locationPermission.launchPermissionRequest()
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -120,14 +133,19 @@ fun MapScreen(navController: NavController) {
                 properties = MapProperties(
                     isMyLocationEnabled = locationPermission.status.isGranted,
                     mapStyleOptions = MapStyleOptions(mapStyle)
-                )
+                ),
             ) {
                 nearbyStores.forEach { store ->
                     store.latLng?.let {
                         Marker(
                             state = MarkerState(position = it),
                             title = store.name,
-                            snippet = store.address
+                            snippet = store.address,
+                            onClick = {
+                                selectedStore = store
+                                showBottomSheet = true
+                                true
+                            }
                         )
                     }
                 }
@@ -155,7 +173,7 @@ fun MapScreen(navController: NavController) {
                 .height(70.dp)
                 .padding(top = 20.dp, start = 20.dp),
             shape = RoundedCornerShape(50.dp),
-            ) {
+        ) {
             Icon(
                 imageVector = Icons.Filled.MyLocation,
                 contentDescription = "My Location",
@@ -163,6 +181,52 @@ fun MapScreen(navController: NavController) {
                     .size(25.dp),
                 tint = colorResource(id = R.color.primary_text)
             )
+        }
+    }
+
+    if (showBottomSheet && selectedStore != null) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+                selectedStore = null
+            },
+            sheetState = sheetState,
+            containerColor = colorResource(id = R.color.background),
+            contentColor = colorResource(id = R.color.primary_text)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .background(colorResource(R.color.background))
+            ) {
+                selectedStore?.let { store ->
+                    store.name?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier.padding(bottom = 16.dp)
+
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        Text(
+                            text = "${store.rating}",
+                            color = colorResource(id = R.color.secondary_text)
+                        )
+                        StarRating(
+                            rating = store.rating?.toFloat() ?: 0f,
+                        )
+                        Text(
+                            text = "(${store.reviews?.size})",
+                            color = colorResource(id = R.color.secondary_text)
+                        )
+                    }
+                }
+            }
         }
     }
 }

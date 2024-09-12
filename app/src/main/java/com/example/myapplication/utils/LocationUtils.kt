@@ -26,7 +26,7 @@ fun searchNearbyStores(
     location: LatLng,
     onPlacesFetched: (List<Place>) -> Unit
 ) {
-    val placeFields = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+    val placeFields = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS, Place.Field.RATING, Place.Field.OPENING_HOURS, Place.Field.REVIEWS)
 
     val result = calculateRectangle(20, location)
 

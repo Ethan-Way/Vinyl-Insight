@@ -111,5 +111,4 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.places)
     implementation("com.google.maps.android:maps-compose:2.11.0")
-
 }
