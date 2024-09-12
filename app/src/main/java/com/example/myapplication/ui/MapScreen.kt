@@ -3,7 +3,9 @@ package com.example.myapplication.ui
 import com.example.myapplication.BuildConfig
 import android.Manifest
 import android.location.Location
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.utils.StarRating
+import com.example.myapplication.utils.isStoreOpen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(
     ExperimentalPermissionsApi::class,
     ExperimentalMaterial3Api::class,
@@ -209,7 +213,9 @@ fun MapScreen(navController: NavController) {
                         )
                     }
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
@@ -225,6 +231,10 @@ fun MapScreen(navController: NavController) {
                             color = colorResource(id = R.color.secondary_text)
                         )
                     }
+                    val isOpen = isStoreOpen(place = store)
+                    Text(
+                        text = isOpen,
+                    )
                 }
             }
         }

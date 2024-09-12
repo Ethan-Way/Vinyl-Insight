@@ -5,4 +5,6 @@
     <color name="secondary_text">#FFADADAD</color>
     <color name="bubble">#FF3b3b3b</color>
     <color name="text_shadow">#FF000000</color>
+    <color name="open_text">#FF278a45</color>
+    <color name="close_Text">#FFd63f37</color>
 </resources>
