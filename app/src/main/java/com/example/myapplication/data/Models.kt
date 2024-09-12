@@ -1,6 +1,8 @@
 package com.example.myapplication.data
 
 import com.google.gson.annotations.SerializedName
+import java.time.DayOfWeek
+import java.time.LocalTime
 
 data class DiscogsResponse(
     val pagination: Pagination,
@@ -72,3 +74,17 @@ data class Rating(
     val average: Double
 )
 
+data class TimeOfWeek(
+    val day: DayOfWeek,
+    val open: LocalTime,
+    val close: LocalTime
+)
+
+data class Period(
+    val open: TimeOfWeek,
+    val close: TimeOfWeek
+)
+
+data class OpeningHours(
+    val periods: List<Period>
+)

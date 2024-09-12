@@ -28,6 +28,7 @@ android {
         buildConfigField("String", "spotifyClientId", localProperties["spotifyClientId"].toString())
         buildConfigField("String", "spotifyClientSecret", localProperties["spotifyClientSecret"].toString())
         buildConfigField("String", "discogsAccessToken", localProperties["discogsAccessToken"].toString())
+        buildConfigField("String", "googleMapsApiKey", localProperties["googleMapsApiKey"].toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -105,5 +106,9 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose.v200)
     implementation(libs.coil.gif)
-    implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation(libs.flexbox)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.places)
+    implementation("com.google.maps.android:maps-compose:2.11.0")
 }

@@ -1,6 +1,8 @@
 package com.example.myapplication.utils
 
+import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
+import kotlin.math.cos
 
 fun parseRecord(record: String): Pair<String, String>? {
     val parts = record.split(" - ")
@@ -71,4 +73,22 @@ fun extractArtistImage(json: String): String? {
         }
     }
     return imageUrl
+}
+
+fun calculateRectangle(miles: Int, location: LatLng): Pair<LatLng, LatLng> {
+    val milesToDegrees = 1.0 / 69.0
+    val latitudeOffset = miles * milesToDegrees
+    val longitudeOffset = miles * milesToDegrees / cos(Math.toRadians(location.latitude))
+
+    // Calculate the southwest and northeast corners
+    val southwest = LatLng(
+        location.latitude - latitudeOffset,
+        location.longitude - longitudeOffset
+    )
+    val northeast = LatLng(
+        location.latitude + latitudeOffset,
+        location.longitude + longitudeOffset
+    )
+
+    return Pair(southwest, northeast)
 }
