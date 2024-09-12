@@ -3,6 +3,7 @@ package com.example.myapplication.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -27,6 +28,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
     private val scanInterval: Long = 5000
 
     private val recordSearch = RecordSearch()
+    private var isToastShown = false
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
@@ -48,49 +50,60 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                         if (currentTime - lastScan > scanInterval) {
                             onLoading(true)
 
-                            recordSearch.searchByBarcode(context, result) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
+                            recordSearch.searchByBarcode(
+                                context,
+                                result
+                            ) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
+                                var toastBool = false
 
-                                val links = url?.let { extractLinks(it) }
-                                val albumLink = links?.second
-                                val artistLink = links?.first
+                                if (record != "No releases found") {
+                                    val links = url?.let { extractLinks(it) }
+                                    val albumLink = links?.second
+                                    val artistLink = links?.first
 
-                                val message = buildString {
-                                    append("Released $year - $country<br><br>")
-                                    append("$format<br><br>")
-                                    append("Label: $label")
+                                    val message = buildString {
+                                        append("Released $year - $country<br><br>")
+                                        append("$format<br><br>")
+                                        append("Label: $label")
+                                    }
+
+                                    val newRecord = Record(
+                                        title = record,
+                                        year = year.toString(),
+                                        country = country.toString(),
+                                        format = format.toString(),
+                                        label = label.toString(),
+                                        genre = genre.toString(),
+                                        style = style.toString(),
+                                        cover = cover.toString(),
+                                        lowestPrice = lowestPrice.toString(),
+                                        numForSale = numForSale.toString(),
+                                        spotifyLink = albumLink ?: "",
+                                        timestamp = System.currentTimeMillis(),
+                                        averageRating = averageRating ?: "",
+                                        ratingCount = ratingCount ?: "",
+                                        artistImage = artistImage ?: "",
+                                        artistLink = artistLink ?: ""
+                                    )
+
+                                    val alertDialog = createRecordDetailDialog(
+                                        context = context,
+                                        record = newRecord,
+                                        message = message,
+                                        onDismiss = { },
+                                        onSave = { }
+                                    )
+
+                                    onLoading(false)
+                                    alertDialog.show()
+                                } else if (!isToastShown) {
+                                    Toast.makeText(context, "No releases found", Toast.LENGTH_SHORT)
+                                        .show()
+                                    isToastShown = true
                                 }
-
-                                val newRecord = Record(
-                                    title = record,
-                                    year = year.toString(),
-                                    country = country.toString(),
-                                    format = format.toString(),
-                                    label = label.toString(),
-                                    genre = genre.toString(),
-                                    style = style.toString(),
-                                    cover = cover.toString(),
-                                    lowestPrice = lowestPrice.toString(),
-                                    numForSale = numForSale.toString(),
-                                    spotifyLink = albumLink ?: "",
-                                    timestamp = System.currentTimeMillis(),
-                                    averageRating = averageRating ?: "",
-                                    ratingCount = ratingCount ?: "",
-                                    artistImage = artistImage ?: "",
-                                    artistLink = artistLink ?: ""
-                                )
-
-                                val alertDialog = createRecordDetailDialog(
-                                    context = context,
-                                    record = newRecord,
-                                    message = message,
-                                    onDismiss = { },
-                                    onSave = { }
-                                )
-
+                                lastScan = currentTime
                                 onLoading(false)
-                                alertDialog.show()
                             }
-                            lastScan = currentTime
                         }
                     }
                 }

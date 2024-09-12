@@ -31,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 
 fun createRecordDetailDialog(
     context: Context,
@@ -85,7 +86,8 @@ fun createRecordDetailDialog(
         artistView.text = artist
     }
 
-    setRatingStars(stars, record.averageRating.toBigDecimal())
+    val rating = record.averageRating.takeIf { it.isNotEmpty() }?.toBigDecimalOrNull() ?: BigDecimal.ZERO
+    setRatingStars(stars, rating)
 
     Glide.with(context)
         .load(record.artistImage)

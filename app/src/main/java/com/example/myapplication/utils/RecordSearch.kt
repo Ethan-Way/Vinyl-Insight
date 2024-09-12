@@ -28,6 +28,7 @@ class RecordSearch {
             ) {
                 if (response.isSuccessful) {
                     val releases = response.body()?.results
+                    Log.d("Barcode", releases.toString())
                     if (!releases.isNullOrEmpty()) {
                         val matchedRecord = releases.find { release ->
                             val releaseBarcodes = release.barcode?.map { it.replace(" ", "") }
@@ -98,7 +99,6 @@ class RecordSearch {
 
                     } else {
                         Handler(Looper.getMainLooper()).post {
-                            Toast.makeText(context, "No releases found", Toast.LENGTH_SHORT).show()
                             callback(
                                 "No releases found",
                                 null,
