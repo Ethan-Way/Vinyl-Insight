@@ -159,6 +159,7 @@ fun MapScreen(navController: NavController) {
                     store.latLng?.let {
                         Marker(
                             state = MarkerState(position = it),
+                            icon = createCustomMarkerIcon(context, store.rating ?: 0f),
                             title = store.name,
                             snippet = store.address,
                             onClick = {
