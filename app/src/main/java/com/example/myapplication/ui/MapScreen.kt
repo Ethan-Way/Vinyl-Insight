@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -61,6 +68,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
 import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.getStoreImages
 import com.example.myapplication.utils.isStoreOpen
@@ -82,6 +93,7 @@ fun MapScreen(navController: NavController) {
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var storeImages by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
 
     if (!Places.isInitialized()) {
         Places.initialize(context, BuildConfig.googleMapsApiKey)
@@ -120,6 +132,18 @@ fun MapScreen(navController: NavController) {
             locationPermission.launchPermissionRequest()
         }
     }
+
+    val fetchImages = {
+        isLoading = true
+        storeImages = emptyList() // Clear previous images
+        selectedStore?.id?.let { placeId ->
+            getStoreImages(placesClient, placeId) { images ->
+                storeImages = images
+                isLoading = false
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -164,11 +188,7 @@ fun MapScreen(navController: NavController) {
                             snippet = store.address,
                             onClick = {
                                 selectedStore = store
-                                selectedStore?.id?.let { placeId ->
-                                    getStoreImages(placesClient, placeId) { images ->
-                                        storeImages = images
-                                    }
-                                }
+                                fetchImages()
                                 showBottomSheet = true
                                 true
                             }
@@ -338,29 +358,64 @@ fun MapScreen(navController: NavController) {
                             }
                         }
                     }
-                    // Display images
-                    if (storeImages.isNotEmpty()) {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                        ) {
-                            items(storeImages) { imageUrl ->
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .width(120.dp)
-                                        .aspectRatio(1f)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(colorResource(id = R.color.background))
-                                ) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(imageUrl),
-                                        contentDescription = "Store Image",
-                                        contentScale = ContentScale.Crop,
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        if (isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .align(Alignment.Center)
+                                    .background(
+                                        colorResource(id = R.color.background),
+                                        RoundedCornerShape(8.dp)
+                                    ),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(R.drawable.loading)
+                                            .decoderFactory(
+                                                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                                                    ImageDecoderDecoder.Factory()
+                                                } else {
+                                                    GifDecoder.Factory()
+                                                }
+                                            )
+                                            .size(Size.ORIGINAL)
+                                            .build()
+                                    ),
+                                    contentDescription = "Loading...",
+                                )
+                            }
+                        } else if (storeImages.isNotEmpty()) {
+                            LazyVerticalStaggeredGrid(
+                                columns = StaggeredGridCells.Adaptive(150.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalItemSpacing = 4.dp,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                items(storeImages.take(8)) { imageUrl ->
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                    )
+                                            .aspectRatio(1f)
+                                            .padding(end = 8.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colorResource(id = R.color.background))
+                                    ) {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(imageUrl),
+                                            contentDescription = "Store Image",
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                        )
+                                    }
                                 }
                             }
                         }
