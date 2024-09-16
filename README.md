@@ -1,1 +1,1 @@
-Koltin app that allows users to scan barcodes on vinyl records and get corresponding information
+Android app that allows users to discover new  music through vinyl records.
