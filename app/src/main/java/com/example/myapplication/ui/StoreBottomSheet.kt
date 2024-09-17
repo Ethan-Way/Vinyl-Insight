@@ -3,22 +3,27 @@ package com.example.myapplication.ui
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,11 +33,13 @@ import com.example.myapplication.R
 import com.google.android.libraries.places.api.model.Place
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.isStoreOpen
@@ -49,6 +56,10 @@ fun StoreBottomSheet(
     onDirectionsClick: (String) -> Unit,
     onWebsiteClick: (String) -> Unit
 ) {
+
+    var selectedImage by remember { mutableStateOf<String?>(null) }
+    var showImageDialog by remember { mutableStateOf(false) }
+
     ModalBottomSheet(
         onDismissRequest = onClose,
         sheetState = sheetState,
@@ -176,6 +187,10 @@ fun StoreBottomSheet(
                                         .fillMaxWidth()
                                         .wrapContentHeight()
                                         .clip(RoundedCornerShape(16.dp))
+                                        .clickable {
+                                            selectedImage = imageUrl
+                                            showImageDialog = true
+                                        }
                                 )
                             }
                         },
