@@ -110,5 +110,6 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.places)
-    implementation("com.google.maps.android:maps-compose:2.11.0")
+    implementation(libs.maps.compose)
+    implementation(libs.androidx.core.splashscreen)
 }

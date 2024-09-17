@@ -367,25 +367,7 @@ fun MapScreen(navController: NavController) {
                                         colorResource(id = R.color.background),
                                         RoundedCornerShape(8.dp)
                                     ),
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(R.drawable.loading)
-                                            .decoderFactory(
-                                                if (android.os.Build.VERSION.SDK_INT >= 28) {
-                                                    ImageDecoderDecoder.Factory()
-                                                } else {
-                                                    GifDecoder.Factory()
-                                                }
-                                            )
-                                            .size(Size.ORIGINAL)
-                                            .build()
-                                    ),
-                                    contentDescription = "Loading...",
-                                )
-                            }
+                            )
                         } else if (storeImages.isNotEmpty()) {
                             LazyVerticalStaggeredGrid(
                                 columns = StaggeredGridCells.Adaptive(150.dp),
