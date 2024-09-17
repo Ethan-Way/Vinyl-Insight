@@ -139,8 +139,6 @@ fun getStoreImages(
 
         photoMetadatas.forEach { photoMetadata ->
             val photoRequest = FetchResolvedPhotoUriRequest.builder(photoMetadata)
-                .setMaxWidth(500)
-                .setMaxHeight(300)
                 .build()
 
             placesClient.fetchResolvedPhotoUri(photoRequest).addOnSuccessListener { photoUriResponse ->

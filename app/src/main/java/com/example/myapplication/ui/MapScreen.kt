@@ -8,31 +8,21 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -55,20 +45,8 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
-import coil.size.Size
-import com.example.myapplication.utils.StarRating
 import com.example.myapplication.utils.getStoreImages
-import com.example.myapplication.utils.isStoreOpen
 import com.google.android.libraries.places.api.Places.initializeWithNewPlacesApiEnabled
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -225,179 +203,27 @@ fun MapScreen(navController: NavController) {
     }
 
     if (showBottomSheet && selectedStore != null) {
-        ModalBottomSheet(
-            onDismissRequest = {
+        StoreBottomSheet(
+            store = selectedStore!!,
+            storeImages = storeImages,
+            isLoading = isLoading,
+            sheetState = sheetState,
+            onClose = {
                 showBottomSheet = false
                 selectedStore = null
             },
-            sheetState = sheetState,
-            containerColor = colorResource(id = R.color.background),
-            contentColor = colorResource(id = R.color.primary_text)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .background(colorResource(R.color.background))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    selectedStore?.let { store ->
-                        store.name?.let {
-                            Text(
-                                text = it,
-                                style = TextStyle(fontSize = 26.sp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(end = 16.dp),
-                                maxLines = Int.MAX_VALUE,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                    Button(
-                        onClick = { showBottomSheet = false },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.bubble),
-                            contentColor = colorResource(id = R.color.primary_text)
-                        ),
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(50.dp),
-                        shape = RoundedCornerShape(50.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close",
-                            modifier = Modifier.size(25.dp),
-                            tint = colorResource(id = R.color.primary_text)
-                        )
-                    }
+            onDirectionsClick = { address ->
+                val uri = Uri.parse("google.navigation:q=$address")
+                val buttonIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                    setPackage("com.google.android.apps.maps")
                 }
-
-                selectedStore?.let { store ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 7.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Text(
-                            text = "${store.rating}",
-                            color = colorResource(id = R.color.secondary_text)
-                        )
-                        StarRating(
-                            rating = store.rating?.toFloat() ?: 0f,
-                        )
-                        Text(
-                            text = "(${store.reviews?.size})",
-                            color = colorResource(id = R.color.secondary_text)
-                        )
-                    }
-                    val isOpen = isStoreOpen(place = store)
-                    Text(
-                        text = isOpen,
-                        modifier = Modifier.padding(bottom = 5.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 7.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                val uri = Uri.parse("google.navigation:q=${store.address}")
-                                val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
-                                buttonIntent.setPackage("com.google.android.apps.maps")
-                                context.startActivity(buttonIntent)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = colorResource(id = R.color.bubble),
-                                contentColor = colorResource(id = R.color.primary_text)
-                            ),
-                            shape = RoundedCornerShape(50.dp)
-                        ) {
-                            Text(
-                                text = "Directions",
-                                style = TextStyle(fontSize = 17.sp)
-                            )
-                        }
-
-                        if (store.websiteUri != null) {
-                            Button(
-                                onClick = {
-                                    val uri = Uri.parse(store.websiteUri?.toString() ?: "")
-                                    val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
-                                    context.startActivity(buttonIntent)
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = colorResource(id = R.color.bubble),
-                                    contentColor = colorResource(id = R.color.primary_text)
-                                ),
-                                shape = RoundedCornerShape(50.dp)
-                            ) {
-                                Text(
-                                    text = "Website",
-                                    style = TextStyle(fontSize = 17.sp)
-                                )
-                            }
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        if (isLoading) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .align(Alignment.Center)
-                                    .background(
-                                        colorResource(id = R.color.background),
-                                        RoundedCornerShape(8.dp)
-                                    ),
-                            )
-                        } else if (storeImages.isNotEmpty()) {
-                            LazyVerticalStaggeredGrid(
-                                columns = StaggeredGridCells.Adaptive(150.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalItemSpacing = 4.dp,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                items(storeImages.take(8)) { imageUrl ->
-                                    Box(
-                                        modifier = Modifier
-                                            .aspectRatio(1f)
-                                            .padding(end = 8.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(colorResource(id = R.color.background))
-                                    ) {
-                                        Image(
-                                            painter = rememberAsyncImagePainter(imageUrl),
-                                            contentDescription = "Store Image",
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                context.startActivity(buttonIntent)
+            },
+            onWebsiteClick = { websiteUri ->
+                val uri = Uri.parse(websiteUri)
+                val buttonIntent = Intent(Intent.ACTION_VIEW, uri)
+                context.startActivity(buttonIntent)
             }
-        }
+        )
     }
 }
