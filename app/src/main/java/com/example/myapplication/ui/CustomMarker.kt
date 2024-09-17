@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @Composable
 fun createCustomMarkerIcon(context: Context, rating: Number): BitmapDescriptor {
-    val iconDrawable: Drawable = ContextCompat.getDrawable(context, R.drawable.loading)!!
+    val iconDrawable: Drawable = ContextCompat.getDrawable(context, R.drawable.marker_icon)!!
     val width = 150
     val height = 80
     val imageSize = 60
