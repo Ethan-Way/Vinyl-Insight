@@ -52,7 +52,7 @@ fun searchNearbyStores(
         Place.Field.ID
     )
 
-    val result = calculateRectangle(20, location)
+    val result = calculateRectangle(10, location)
 
     val rectangle = RectangularBounds.newInstance(result.first, result.second)
 
