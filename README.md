@@ -21,3 +21,5 @@ The **Vinyl Scanner App** is designed to enhance your vinyl record shopping expe
 - **Finding Record Stores**: Use the store locator feature to find nearby record shops.
 
 ## Screenshots
+![Screenshot_20240919-140815](https://github.com/user-attachments/assets/c27f6113-5b63-4269-bee7-c39ff9ce6c9d)
+
