@@ -21,7 +21,12 @@ The **Vinyl Scanner App** is designed to enhance your vinyl record shopping expe
 - **Finding Record Stores**: Use the store locator feature to find nearby record shops.
 
 ## Screenshots
-<img src="https://github.com/user-attachments/assets/c27f6113-5b63-4269-bee7-c39ff9ce6c9d" width="50%" />
-<img src="https://github.com/user-attachments/assets/b31f1bf0-0b26-4496-be3c-474ca03afffa" width="50%" />
-<img src="https://github.com/user-attachments/assets/8b60d514-7899-4588-8bd4-8a38c1a31fdf" width="50%" />
-<img src="https://github.com/user-attachments/assets/c30c15db-3b7b-4a49-a59c-8db90ef0818f" width="50%" />
+<div style="display: flex; justify-content: space-between;">
+    <img src="https://github.com/user-attachments/assets/c27f6113-5b63-4269-bee7-c39ff9ce6c9d" width="45%" style="margin-right: 10px;" />
+    <img src="https://github.com/user-attachments/assets/b31f1bf0-0b26-4496-be3c-474ca03afffa" width="45%" />
+</div>
+
+<div style="display: flex; justify-content: space-between;">
+    <img src="https://github.com/user-attachments/assets/8b60d514-7899-4588-8bd4-8a38c1a31fdf" width="45%" style="margin-right: 10px;" />
+    <img src="https://github.com/user-attachments/assets/c30c15db-3b7b-4a49-a59c-8db90ef0818f" width="45%" />
+</div>
