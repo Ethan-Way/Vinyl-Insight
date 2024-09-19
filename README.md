@@ -30,3 +30,7 @@ The **Vinyl Scanner App** is designed to enhance your vinyl record shopping expe
     <img src="https://github.com/user-attachments/assets/8b60d514-7899-4588-8bd4-8a38c1a31fdf" width="45%" style="margin-right: 10px;" />
     <img src="https://github.com/user-attachments/assets/c30c15db-3b7b-4a49-a59c-8db90ef0818f" width="45%" />
 </div>
+
+---
+
+[Connect with me on LinkedIn](https://www.linkedin.com/in/ethan-d-way/)
