@@ -55,7 +55,6 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                                 context,
                                 result
                             ) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
-                                var toastBool = false
 
                                 if (record != "No releases found") {
                                     val links = url?.let { extractLinks(it) }
