@@ -48,6 +48,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                     if (result.isNotEmpty()) {
                         val currentTime = System.currentTimeMillis()
                         if (currentTime - lastScan > scanInterval) {
+                            lastScan = currentTime
                             onLoading(true)
 
                             recordSearch.searchByBarcode(
