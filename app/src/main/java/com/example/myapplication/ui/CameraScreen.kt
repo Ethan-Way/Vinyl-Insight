@@ -1,12 +1,17 @@
 package com.example.myapplication.ui
 
 import android.app.Activity
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.myapplication.R
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -47,6 +52,7 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CameraScreen(navController: NavController) {
     val windowContext = LocalContext.current
@@ -57,6 +63,8 @@ fun CameraScreen(navController: NavController) {
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(localContext)
     }
+
+    val vibrator = localContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     LaunchedEffect(Unit) {
         activity?.window?.let { window ->
@@ -85,6 +93,15 @@ fun CameraScreen(navController: NavController) {
                 ContextCompat.getMainExecutor(context),
                 BarCodeAnalyzer(context, onLoading = { loading ->
                     isLoading = loading
+                }, onBarCodeScanned = {
+                    if (vibrator.hasVibrator()) {
+                        vibrator.vibrate(
+                            VibrationEffect.createOneShot(
+                                200,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    }
                 })
             )
 
@@ -138,7 +155,7 @@ fun CameraScreen(navController: NavController) {
             ),
             modifier = Modifier
                 .align(alignment = Alignment.TopEnd)
-                .offset(y=35.dp)
+                .offset(y = 35.dp)
                 .width(70.dp)
                 .height(70.dp)
                 .padding(top = 20.dp, end = 20.dp),
@@ -162,7 +179,7 @@ fun CameraScreen(navController: NavController) {
             ),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(y=35.dp)
+                .offset(y = 35.dp)
                 .width(70.dp)
                 .height(70.dp)
                 .padding(top = 20.dp, start = 20.dp),

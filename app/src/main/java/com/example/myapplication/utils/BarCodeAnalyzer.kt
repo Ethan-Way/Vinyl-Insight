@@ -13,7 +13,11 @@ import com.google.mlkit.vision.common.InputImage
 import com.example.myapplication.data.Record
 import com.example.myapplication.ui.createRecordDetailDialog
 
-class BarCodeAnalyzer(private val context: Context, private val onLoading: (Boolean) -> Unit) :
+class BarCodeAnalyzer(
+    private val context: Context,
+    private val onLoading: (Boolean) -> Unit,
+    private val onBarCodeScanned: () -> Unit
+) :
     ImageAnalysis.Analyzer {
 
     private val options = BarcodeScannerOptions.Builder()
@@ -50,6 +54,7 @@ class BarCodeAnalyzer(private val context: Context, private val onLoading: (Bool
                         if (currentTime - lastScan > scanInterval) {
                             lastScan = currentTime
                             onLoading(true)
+                            onBarCodeScanned()
 
                             recordSearch.searchByBarcode(
                                 context,
