@@ -64,7 +64,7 @@ fun createRecordDetailDialog(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                marginEnd = 16
+                setMargins(0, 0, 16, 16)
             }
         }
         styleContainer.addView(styleTextView)
