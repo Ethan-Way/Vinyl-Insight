@@ -17,6 +17,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
@@ -76,6 +77,7 @@ fun CameraScreen(navController: NavController) {
     // Manage the loading state
     var isLoading by remember { mutableStateOf(false) }
 
+
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
@@ -120,19 +122,43 @@ fun CameraScreen(navController: NavController) {
 
     Box(modifier = Modifier.fillMaxSize()) {
 
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+
+            val boxWidth = canvasWidth * 0.8f
+            val boxHeight = canvasHeight * 0.2f
+            val left = (canvasWidth - boxWidth) / 2
+            val top = (canvasHeight - boxHeight) / 2
+
+            // Draw the dark overlay
+            drawRect(
+                color = Color.Black.copy(alpha = 0.6f),
+                size = size
+            )
+
+            // Cut out the scanning area
+            drawRect(
+                color = Color.Transparent,
+                topLeft = androidx.compose.ui.geometry.Offset(left, top),
+                size = androidx.compose.ui.geometry.Size(boxWidth, boxHeight),
+                blendMode = androidx.compose.ui.graphics.BlendMode.Clear
+            )
+        }
+
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color.Black.copy(alpha = 0.8f))
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black.copy(alpha = 0.8f)),
+                contentAlignment = Alignment.Center
+            ) {
                 Image(
                     painter = rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
                             .data(R.drawable.loading)
                             .decoderFactory(
-                                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                                if (Build.VERSION.SDK_INT >= 28) {
                                     ImageDecoderDecoder.Factory()
                                 } else {
                                     GifDecoder.Factory()
@@ -141,11 +167,12 @@ fun CameraScreen(navController: NavController) {
                             .size(Size.ORIGINAL)
                             .build()
                     ),
-                    contentDescription = "Loading...",
+                    contentDescription = "Loading..."
                 )
             }
         }
 
+        // Navigation button
         Button(
             onClick = { navController.navigate("savedScreen") },
             colors = ButtonDefaults.buttonColors(
@@ -160,14 +187,13 @@ fun CameraScreen(navController: NavController) {
                 .padding(top = 20.dp, end = 20.dp),
             shape = RoundedCornerShape(50.dp),
             contentPadding = PaddingValues(0.dp)
-
         ) {
             Icon(
                 imageVector = Icons.Filled.Bookmark,
                 contentDescription = "Bookmark",
-                modifier = Modifier
-                    .size(25.dp)
+                modifier = Modifier.size(25.dp)
             )
         }
     }
+
 }

@@ -17,13 +17,10 @@ class BarCodeAnalyzer(
     private val context: Context,
     private val onLoading: (Boolean) -> Unit,
     private val onBarCodeScanned: () -> Unit
-) :
-    ImageAnalysis.Analyzer {
+) : ImageAnalysis.Analyzer {
 
     private val options = BarcodeScannerOptions.Builder()
-        .setBarcodeFormats(
-            Barcode.FORMAT_ALL_FORMATS
-        )
+        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
         .build()
 
     private val scanner = BarcodeScanning.getClient(options)
@@ -33,16 +30,18 @@ class BarCodeAnalyzer(
 
     private val recordSearch = RecordSearch()
     private var isToastShown = false
+    private var isDialogOpen = false // Flag to prevent scanning while dialog is open
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
+        if (isDialogOpen) { // Prevent scanning if a dialog is open
+            imageProxy.close()
+            return
+        }
 
         imageProxy.image?.let { image ->
-
             scanner.process(
-                InputImage.fromMediaImage(
-                    image, imageProxy.imageInfo.rotationDegrees
-                )
+                InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees)
             ).addOnSuccessListener { barcode ->
                 if (barcode.isNotEmpty()) {
                     val result = barcode.mapNotNull {
@@ -57,8 +56,7 @@ class BarCodeAnalyzer(
                             onBarCodeScanned()
 
                             recordSearch.searchByBarcode(
-                                context,
-                                result
+                                context, result
                             ) { record, year, country, format, label, genre, style, cover, lowestPrice, numForSale, url, averageRating, ratingCount, artistImage ->
 
                                 if (record != "No releases found") {
@@ -91,19 +89,23 @@ class BarCodeAnalyzer(
                                         artistLink = artistLink ?: ""
                                     )
 
+                                    isDialogOpen = true // Disable scanning when dialog opens
+
                                     val alertDialog = createRecordDetailDialog(
                                         context = context,
                                         record = newRecord,
                                         message = message,
-                                        onDismiss = { },
+                                        onDismiss = {
+                                            isDialogOpen =
+                                                false // Re-enable scanning when dialog closes
+                                        },
                                         onSave = { }
                                     )
 
                                     onLoading(false)
                                     alertDialog.show()
                                 } else if (!isToastShown) {
-                                    Toast.makeText(context, "No releases found", Toast.LENGTH_SHORT)
-                                        .show()
+                                    Toast.makeText(context, "No releases found", Toast.LENGTH_SHORT).show()
                                     isToastShown = true
                                 }
                                 lastScan = currentTime
