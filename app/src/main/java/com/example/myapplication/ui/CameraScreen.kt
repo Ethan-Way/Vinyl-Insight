@@ -138,11 +138,21 @@ fun CameraScreen(navController: NavController) {
             )
 
             // Cut out the scanning area
-            drawRect(
+            drawRoundRect(
                 color = Color.Transparent,
                 topLeft = androidx.compose.ui.geometry.Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(boxWidth, boxHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx(), 20.dp.toPx()),
                 blendMode = androidx.compose.ui.graphics.BlendMode.Clear
+            )
+
+            // Draw a white outline around the transparent cutout
+            drawRoundRect(
+                color = Color.White,
+                topLeft = androidx.compose.ui.geometry.Offset(left, top),
+                size = androidx.compose.ui.geometry.Size(boxWidth, boxHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx(), 20.dp.toPx()),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 5.dp.toPx())
             )
         }
 
