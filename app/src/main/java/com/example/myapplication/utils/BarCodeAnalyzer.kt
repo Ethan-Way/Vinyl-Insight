@@ -99,7 +99,7 @@ class BarCodeAnalyzer(
                                             isDialogOpen =
                                                 false // Re-enable scanning when dialog closes
                                         },
-                                        onSave = { }
+                                        onSave = { isDialogOpen = false }
                                     )
 
                                     onLoading(false)
